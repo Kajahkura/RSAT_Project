@@ -1,0 +1,10 @@
+# .gitignore
+__pycache__/
+build/
+dist/
+*.spec
+*.exe
+*.html
+venv/
+.DS_Store
+
