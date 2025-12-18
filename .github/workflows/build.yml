@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*' # Trigger build
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build on ${{ matrix.os }}
