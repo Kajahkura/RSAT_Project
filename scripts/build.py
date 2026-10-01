@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import platform
+import shutil
 import subprocess
 import sys
 
@@ -24,7 +25,11 @@ args = [
     "--collect-data",
     "rsat",
     "--collect-all",
-    "cryptography",
+    "Cryptodome",
     str(root / "src/audit_tool.py"),
 ]
 subprocess.run(args, cwd=root, check=True)
+
+# Ship the project grant and the runtime crypto redistribution notice with artifacts.
+for source in (root / "LICENSE", root / "docs/licenses/pycryptodomex.txt"):
+    shutil.copy2(source, root / "dist" / source.name)

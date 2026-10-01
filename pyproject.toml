@@ -13,10 +13,7 @@ authors = [{name = "OFINFIX"}]
 dependencies = []
 
 [project.optional-dependencies]
-crypto = [
-  "cryptography==50.0.2; sys_platform != 'darwin' or platform_machine != 'x86_64'",
-  "cryptography==48.0.1; sys_platform == 'darwin' and platform_machine == 'x86_64'",
-]
+crypto = ["pycryptodomex==3.23.0"]
 
 [project.scripts]
 rsat = "rsat.cli:main"

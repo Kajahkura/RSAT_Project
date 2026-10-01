@@ -16,34 +16,20 @@ MAX_BUNDLE = 50_000_000
 
 def crypto():
     try:
-        from cryptography.hazmat.primitives import hashes, serialization
-        from cryptography.hazmat.primitives.asymmetric import ed25519, x25519
-        from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-        from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+        from . import _crypto
     except ImportError as exc:
         raise ValueError("Cryptography support requires: pip install 'rsat-audit[crypto]'") from exc
-    return hashes, serialization, ed25519, x25519, AESGCM, HKDF
+    return _crypto
 
 
 def generate_keys(directory):
-    _, serialization, ed25519, x25519, _, _ = crypto()
+    c = crypto()
     directory = Path(directory)
     directory.mkdir(mode=0o700, parents=True, exist_ok=False)
-    for name, cls in (("signing", ed25519.Ed25519PrivateKey), ("recipient", x25519.X25519PrivateKey)):
-        key = cls.generate()
-        write_new(
-            directory / f"{name}.key.pem",
-            key.private_bytes(
-                serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()
-            ),
-        )
-        write_new(
-            directory / f"{name}.pub.pem",
-            key.public_key().public_bytes(
-                serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo
-            ),
-            0o644,
-        )
+    for name, curve in (("signing", "Ed25519"), ("recipient", "Curve25519")):
+        key = c.generate_key(curve)
+        write_new(directory / f"{name}.key.pem", c.private_pem(key))
+        write_new(directory / f"{name}.pub.pem", c.public_pem(key), 0o644)
     return directory
 
 
@@ -60,14 +46,10 @@ def create_bundle(entries, path, signing_key=None):
     manifest_bytes = canonical(manifest)
     extra = {"manifest.json": manifest_bytes}
     if signing_key:
-        _, serialization, ed25519, _, _, _ = crypto()
-        key = serialization.load_pem_private_key(Path(signing_key).read_bytes(), password=None)
-        if not isinstance(key, ed25519.Ed25519PrivateKey):
-            raise ValueError("Signing key must be Ed25519")
-        extra["manifest.sig"] = key.sign(manifest_bytes)
-        extra["signer.pub.pem"] = key.public_key().public_bytes(
-            serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo
-        )
+        c = crypto()
+        key = c.load_key(Path(signing_key).read_bytes(), "Ed25519", private=True)
+        extra["manifest.sig"] = c.sign(key, manifest_bytes)
+        extra["signer.pub.pem"] = c.public_pem(key)
     if set(entries) & set(extra):
         raise ValueError("Reserved bundle entry name")
     output = io.BytesIO()
@@ -107,15 +89,13 @@ def verify_bundle(path, trusted_key=None):
         if trusted_key and not signed:
             raise ValueError("A trusted signature was requested but the bundle is unsigned")
         if signed:
-            _, serialization, ed25519, _, _, _ = crypto()
+            c = crypto()
             if "signer.pub.pem" not in names:
                 raise ValueError("Signer key missing")
             key_bytes = Path(trusted_key).read_bytes() if trusted_key else archive.read("signer.pub.pem")
-            key = serialization.load_pem_public_key(key_bytes)
-            if not isinstance(key, ed25519.Ed25519PublicKey):
-                raise ValueError("Expected Ed25519 verification key")
+            key = c.load_key(key_bytes, "Ed25519")
             try:
-                key.verify(archive.read("manifest.sig"), manifest_bytes)
+                c.verify(key, archive.read("manifest.sig"), manifest_bytes)
             except Exception as exc:
                 raise ValueError("Signature verification failed") from exc
         return {
@@ -127,59 +107,44 @@ def verify_bundle(path, trusted_key=None):
 
 
 def encrypt_bundle(source, destination, recipient_key):
-    hashes, serialization, _, x25519, AESGCM, HKDF = crypto()
+    c = crypto()
     content = Path(source).read_bytes()
     if len(content) > MAX_BUNDLE:
         raise ValueError("Bundle exceeds size limit")
-    public = serialization.load_pem_public_key(Path(recipient_key).read_bytes())
-    if not isinstance(public, x25519.X25519PublicKey):
-        raise ValueError("Recipient key must be X25519")
-    ephemeral = x25519.X25519PrivateKey.generate()
+    public = c.load_key(Path(recipient_key).read_bytes(), "Curve25519")
+    ephemeral = c.generate_key("Curve25519")
     header = {
         "schema_version": "1.0",
         "algorithm": "X25519-HKDF-SHA256-AES256GCM",
-        "ephemeral": base64.b64encode(
-            ephemeral.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-        ).decode(),
+        "ephemeral": base64.b64encode(c.public_raw(ephemeral)).decode(),
         "salt": base64.b64encode(os.urandom(32)).decode(),
         "nonce": base64.b64encode(os.urandom(12)).decode(),
     }
     aad = canonical(header)
-    key = HKDF(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=base64.b64decode(header["salt"]),
-        info=b"RSAT evidence bundle v1",
-    ).derive(ephemeral.exchange(public))
+    key = c.derive(ephemeral, public, base64.b64decode(header["salt"]))
     envelope = {
         **header,
         "ciphertext": base64.b64encode(
-            AESGCM(key).encrypt(base64.b64decode(header["nonce"]), content, aad)
+            c.encrypt(key, base64.b64decode(header["nonce"]), content, aad)
         ).decode(),
     }
     return write_new(destination, canonical(envelope))
 
 
 def decrypt_bundle(source, destination, private_key):
-    hashes, serialization, _, x25519, AESGCM, HKDF = crypto()
+    c = crypto()
     if Path(source).stat().st_size > MAX_BUNDLE * 2:
         raise ValueError("Encrypted bundle exceeds size limit")
     envelope = json.loads(Path(source).read_bytes())
     if envelope.get("schema_version") != "1.0" or envelope.get("algorithm") != "X25519-HKDF-SHA256-AES256GCM":
         raise ValueError("Unsupported encrypted bundle")
-    private = serialization.load_pem_private_key(Path(private_key).read_bytes(), password=None)
-    if not isinstance(private, x25519.X25519PrivateKey):
-        raise ValueError("Recipient private key must be X25519")
+    private = c.load_key(Path(private_key).read_bytes(), "Curve25519", private=True)
     header = {k: v for k, v in envelope.items() if k != "ciphertext"}
-    public = x25519.X25519PublicKey.from_public_bytes(base64.b64decode(header["ephemeral"], validate=True))
-    key = HKDF(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=base64.b64decode(header["salt"], validate=True),
-        info=b"RSAT evidence bundle v1",
-    ).derive(private.exchange(public))
+    public = c.import_recipient(base64.b64decode(header["ephemeral"], validate=True))
+    key = c.derive(private, public, base64.b64decode(header["salt"], validate=True))
     try:
-        content = AESGCM(key).decrypt(
+        content = c.decrypt(
+            key,
             base64.b64decode(header["nonce"], validate=True),
             base64.b64decode(envelope["ciphertext"], validate=True),
             canonical(header),

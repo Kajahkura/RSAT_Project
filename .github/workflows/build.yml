@@ -61,13 +61,8 @@ jobs:
           python-version: '3.13'
       - run: python -m pip install -r requirements-dev.txt -e .
       - run: python scripts/build.py
-      - name: Smoke-test standalone executable
-        shell: bash
-        run: |
-          for binary in dist/RSAT_*; do
-            "$binary" --version
-            "$binary" audit --deadline 30 --command-timeout 3 --output binary-smoke
-          done
+      - name: Smoke-test standalone audit and cryptography
+        run: python scripts/binary_smoke.py
       - run: python scripts/release_manifest.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -95,7 +90,7 @@ jobs:
           from pathlib import Path
           for folder in Path('release-assets').iterdir():
               for file in folder.iterdir():
-                  if file.name in {'SHA256SUMS.txt', 'build-environment.cdx.json'}:
+                  if file.name in {'SHA256SUMS.txt', 'build-environment.cdx.json', 'LICENSE', 'pycryptodomex.txt'}:
                       file.rename(file.with_name(folder.name + '-' + file.name))
           PY
       - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
