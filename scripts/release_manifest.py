@@ -33,7 +33,7 @@ sbom = {
     "version": 1,
     "metadata": {
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "component": {"type": "application", "name": "RSAT", "version": "2.0.0"},
+        "component": {"type": "application", "name": "RSAT", "version": importlib.metadata.version("rsat-audit")},
         "properties": [
             {"name": "rsat:scope", "value": "build-environment inventory; not a binary composition claim"},
             {"name": "rsat:platform", "value": platform.platform()},

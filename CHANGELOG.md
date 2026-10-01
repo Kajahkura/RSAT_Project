@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1 — 2026-10-01
+
+- Build the Linux executable on Ubuntu 22.04 for the glibc 2.35 baseline. The initial 2.0.0 Linux build required GLIBC_2.38 and could not launch on Ubuntu 22.04.
+- Keep release inventories tied to the actual installed RSAT version.
+
 ## 2.0.0 — 2026-10-01
 
 - Replaced monolithic checks with collectors, normalized evidence, and constrained versioned policies.

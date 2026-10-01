@@ -38,7 +38,7 @@ Every conclusion links to collected evidence and a versioned rule. PASS, FAIL, U
 
 ## Quick start
 
-Download a portable binary from the [2.0 release](https://github.com/Kajahkura/RSAT_Project/releases/tag/v2.0.0), verify its published checksum/provenance, or run from source. The legacy 1.0 release uses less reliable checks; it does not contain the features described here.
+Download a portable binary from the [latest release](https://github.com/Kajahkura/RSAT_Project/releases/latest), verify its published checksum/provenance, or run from source. The legacy 1.0 release uses less reliable checks; it does not contain the features described here.
 
 ```bash
 git clone https://github.com/Kajahkura/RSAT_Project.git

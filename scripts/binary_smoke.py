@@ -18,7 +18,7 @@ def main():
                 [binary, *map(str, args)], cwd=root, check=True, capture_output=True, text=True, timeout=120
             ).stdout
 
-        assert "2.0.0" in run("--version")
+        assert "RSAT 2." in run("--version")
         run("keygen", "keys")
         run(
             "audit",
