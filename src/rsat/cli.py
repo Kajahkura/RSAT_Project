@@ -38,6 +38,9 @@ def parser():
     a.add_argument("--asset-salt-file", type=Path, help="Engagement secret for pseudonymous asset matching")
     a.add_argument("--include-hostname", action="store_true")
     a.add_argument("--intel-pack", type=Path)
+    a.add_argument("--intel-bundle", type=Path, help="Signed bundle containing the chosen intelligence pack")
+    a.add_argument("--intel-key", type=Path, help="Pinned intelligence publisher public key")
+    a.add_argument("--enrichment", type=Path, help="Import separately refreshed KEV/EPSS metadata")
     a.add_argument("--online-osv", action="store_true", help="Send inventory package metadata to OSV")
     a.add_argument("--reachability", type=Path, help="Import a separate-host probe JSON file")
     a.add_argument("--osquery", type=Path, help="Explicit trusted osqueryi binary")
@@ -66,6 +69,7 @@ def parser():
     b = sub.add_parser("bundle", help="Package an audit or a declarative policy")
     b.add_argument("source", type=Path)
     b.add_argument("--policy", action="store_true")
+    b.add_argument("--intelligence", action="store_true")
     b.add_argument("--output", type=Path, required=True)
     b.add_argument("--signing-key", type=Path)
     i = sub.add_parser("intel-refresh", help="Download KEV/EPSS metadata for specified CVEs")
@@ -140,6 +144,20 @@ def run_audit(args):
         raise ValueError("--recipient-key requires --bundle")
     if bool(args.policy_bundle) != bool(args.policy_key) or (args.policy_bundle and not args.policy):
         raise ValueError("Signed policy use requires --policy, --policy-bundle, and --policy-key together")
+    if bool(args.intel_bundle) != bool(args.intel_key) or (args.intel_bundle and not args.intel_pack):
+        raise ValueError(
+            "Signed intelligence use requires --intel-pack, --intel-bundle, and --intel-key together"
+        )
+    if args.intel_bundle:
+        verification = verify_bundle(args.intel_bundle, args.intel_key)
+        import zipfile
+
+        with zipfile.ZipFile(args.intel_bundle) as archive:
+            if (
+                "intelligence.json" not in verification["files"]
+                or archive.read("intelligence.json") != args.intel_pack.read_bytes()
+            ):
+                raise ValueError("Intelligence pack does not match the pinned signed bundle")
     if args.policy_bundle:
         verification = verify_bundle(args.policy_bundle, args.policy_key)
         import zipfile
@@ -194,8 +212,15 @@ def run_audit(args):
         inventory = [inventory]
     if args.intel_pack:
         pack, metadata = load_pack(args.intel_pack)
+        metadata["publisher_verified"] = bool(args.intel_bundle)
         audit["intelligence"] = metadata
         audit["vulnerabilities"] = match_inventory(inventory, pack)
+    if args.enrichment:
+        from .intelligence import enrich
+
+        audit["vulnerabilities"], audit["enrichment"] = enrich(
+            audit["vulnerabilities"], read_json(args.enrichment)
+        )
     if args.online_osv:
         vulnerabilities, skipped = query_osv(inventory, budget=min(30, runner.remaining))
         audit["vulnerabilities"].extend(vulnerabilities)
@@ -294,9 +319,22 @@ def main(argv=None):
         elif args.command == "decrypt":
             decrypt_bundle(args.source, args.output, args.key)
         elif args.command == "bundle":
-            data = load_policy(args.source) if args.policy else load_audit(args.source)
-            entries = {"policy.json" if args.policy else "audit.json": canonical(data)}
-            if not args.policy:
+            if args.policy and args.intelligence:
+                raise ValueError("Choose one bundle type")
+            data = (
+                load_pack(args.source)[0]
+                if args.intelligence
+                else load_policy(args.source)
+                if args.policy
+                else load_audit(args.source)
+            )
+            name = (
+                "intelligence.json" if args.intelligence else "policy.json" if args.policy else "audit.json"
+            )
+            entries = {
+                name: args.source.read_bytes() if args.policy or args.intelligence else canonical(data)
+            }
+            if not args.policy and not args.intelligence:
                 entries["report.html"] = render(data).encode()
             create_bundle(entries, args.output, args.signing_key)
         elif args.command == "intel-refresh":

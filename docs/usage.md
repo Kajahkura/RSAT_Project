@@ -41,12 +41,15 @@ An exception file is a list of records containing `control_id`, `reason`, and an
 ```bash
 rsat audit --inventory --intel-pack advisories.json
 rsat intel-refresh CVE-2026-10000 --output enrichment.json
+rsat audit --intel-pack advisories.json --enrichment enrichment.json
+rsat bundle advisories.json --intelligence --output intelligence.zip --signing-key keys/signing.key.pem
+rsat audit --intel-pack advisories.json --intel-bundle intelligence.zip --intel-key keys/signing.pub.pem
 rsat audit --inventory --online-osv
 ```
 
 Offline pack examples are in `examples/`. The matching contract requires exact package name, ecosystem, and an explicit affected version. It deliberately does not guess version ranges. Verify vendor/platform applicability. Public KEV/EPSS enrichment is downloaded separately and can be attached to validated advisory records; a KEV match establishes exploitation of a CVE in the wild, not compromise of a particular machine.
 
-OSV is optional and sends package metadata to its public API. Unsupported ecosystems, missing versions, and items not processed within the budget are recorded as skipped. It does not cover every proprietary Windows/macOS application. Offline packs record source time, hash, and staleness; a recorded hash alone is not publisher authentication.
+OSV is optional and sends package metadata to its public API. Unsupported ecosystems, missing versions, and items not processed within the budget are recorded as skipped. It does not cover every proprietary Windows/macOS application. Offline packs record source time, hash, and staleness; a recorded hash alone is not publisher authentication. Pin the publisher public key with a signed intelligence bundle when distributor authentication is required.
 
 ## Evidence signing and recipient encryption
 

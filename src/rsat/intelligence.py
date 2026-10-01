@@ -152,3 +152,39 @@ def query_osv(packages, budget=30):
                 }
             )
     return results, skipped
+
+
+def enrich(vulnerabilities, data):
+    if not isinstance(data, dict) or not isinstance(data.get("cves"), dict):
+        raise ValueError("Invalid enrichment file")
+    generated = datetime.fromisoformat(data["generated_at"].replace("Z", "+00:00"))
+    if generated.tzinfo is None:
+        raise ValueError("Enrichment timestamp requires timezone")
+    age = (datetime.now(timezone.utc) - generated).total_seconds() / 86400
+    if age < -1:
+        raise ValueError("Enrichment has a future timestamp")
+    results = []
+    for vulnerability in vulnerabilities:
+        ids = [vulnerability["id"], *vulnerability.get("aliases", [])]
+        matches = [data["cves"][ident] for ident in ids if ident in data["cves"]]
+        result = dict(vulnerability)
+        for match in matches:
+            if not isinstance(match.get("known_exploited", False), bool):
+                raise ValueError("Invalid exploitation metadata")
+            if match.get("epss") is not None and (
+                not isinstance(match["epss"], (int, float)) or not 0 <= match["epss"] <= 1
+            ):
+                raise ValueError("Invalid EPSS enrichment")
+            result["known_exploited"] = result.get("known_exploited", False) or match.get(
+                "known_exploited", False
+            )
+            if match.get("epss") is not None:
+                result["epss"] = max(result.get("epss") or 0, match["epss"])
+                result["epss_date"] = match.get("epss_date")
+        results.append(result)
+    return results, {
+        "generated_at": data["generated_at"],
+        "age_days": round(max(0, age), 1),
+        "stale": age > 7,
+        "kev_catalog_version": data.get("kev_catalog_version"),
+    }
