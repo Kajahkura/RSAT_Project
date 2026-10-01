@@ -10,7 +10,7 @@ from rsat.exports import local_summary
 from rsat.intelligence import request_json
 from rsat.model import validate_audit
 from rsat.policy import compare, validate_policy, load_policy
-from rsat.remediation import action_value, rollback
+from rsat.remediation import action_value, rollback, target_fingerprint
 from rsat.runner import CommandResult
 from rsat.storage import read_json
 
@@ -101,6 +101,7 @@ def test_rollback_execution_verifies_saved_profiles(tmp_path):
                 "platform": "Windows",
                 "action": "windows-firewall-enable",
                 "before": profiles,
+                "target_fingerprint": target_fingerprint(),
             }
         )
     )

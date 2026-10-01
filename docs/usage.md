@@ -73,7 +73,7 @@ rsat rollback firewall-before.json
 rsat rollback firewall-before.json --execute --recovery-access
 ```
 
-Default behavior is dry-run. Automated actions are limited to Windows firewall enablement, macOS firewall enablement, and macOS stealth mode. Other controls receive manual instructions. Review the plan on the target, preserve console/recovery access, and check centrally managed policy ownership. A successful command is followed by native verification. Re-audit for the full control result. Some platform states cannot be safely reconstructed automatically and require manual recovery.
+Default behavior is dry-run. Execution plans and rollback backups are bound to the collected endpoint hostname fingerprint; generate a fresh audit/plan on the target and preserve it locally. Automated actions are limited to Windows firewall enablement, macOS firewall enablement, and macOS stealth mode. Other controls receive manual instructions. Review the plan on the target, preserve console/recovery access, and check centrally managed policy ownership. A successful command is followed by native verification. Re-audit for the full control result. Some platform states cannot be safely reconstructed automatically and require manual recovery.
 
 ## Existing SSH and reachability
 

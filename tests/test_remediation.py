@@ -1,7 +1,7 @@
 from unittest.mock import Mock, patch
 import json
 import pytest
-from rsat.remediation import apply_action, plan, rollback
+from rsat.remediation import apply_action, plan, rollback, target_fingerprint
 from rsat.runner import CommandResult
 
 
@@ -9,6 +9,7 @@ def planned():
     return {
         "platform": "Windows",
         "plan_id": "test",
+        "target_fingerprint": target_fingerprint(),
         "items": [{"automated_action": "windows-firewall-enable"}],
     }
 

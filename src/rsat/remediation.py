@@ -39,6 +39,10 @@ ACTIONS = {
 }
 
 
+def target_fingerprint():
+    return hashlib.sha256(platform.node().encode("utf-8")).hexdigest()
+
+
 def plan(audit):
     return {
         "schema_version": "1.0",
@@ -48,6 +52,7 @@ def plan(audit):
         "asset_id": audit["asset_id"],
         "platform": audit["platform"],
         "audit_sha256": hashlib.sha256(canonical(audit)).hexdigest(),
+        "target_fingerprint": audit.get("target_fingerprint"),
         "items": [
             {
                 "control_id": f["id"],
@@ -115,6 +120,8 @@ def apply_action(plan_data, action, backup_path, execute=False, runner=None, rec
         }
     if not recovery_access:
         raise ValueError("Execution requires --recovery-access to acknowledge console/recovery access")
+    if plan_data.get("target_fingerprint") != target_fingerprint():
+        raise ValueError("Remediation plan is not bound to this endpoint; generate the plan on the target")
     if not privileged():
         raise ValueError("This explicit remediation command requires administrator privileges")
     runner = runner or CommandRunner(deadline=45)
@@ -126,6 +133,7 @@ def apply_action(plan_data, action, backup_path, execute=False, runner=None, rec
         "created_at": utcnow(),
         "plan_id": plan_data.get("plan_id"),
         "before": before,
+        "target_fingerprint": target_fingerprint(),
     }
     write_new(backup_path, canonical(backup))
     result = native(runner, definition["apply"])
@@ -181,6 +189,8 @@ def rollback(backup_path, execute=False, runner=None, recovery_access=False):
         return {"dry_run": True, "action": action, "commands": commands}
     if not recovery_access or not privileged():
         raise ValueError("Rollback execution requires administrator privileges and --recovery-access")
+    if backup.get("target_fingerprint") != target_fingerprint():
+        raise ValueError("Rollback backup is not bound to this endpoint")
     runner = runner or CommandRunner(deadline=45)
     for command in commands:
         result = native(runner, command)

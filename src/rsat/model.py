@@ -60,6 +60,7 @@ def new_audit(asset_salt="", include_hostname=False):
         "collector_version": __version__,
         "audit_id": str(uuid.uuid4()),
         "asset_id": asset_id,
+        "target_fingerprint": hashlib.sha256(hostname.encode("utf-8")).hexdigest(),
         "asset_id_scope": "engagement" if asset_salt else "unsalted-hostname-hash",
         "hostname": hostname if include_hostname else None,
         "platform": platform.system(),
