@@ -86,7 +86,11 @@ def test_schema_invalid_metadata(audit):
 
 def test_expired_exception_diff(audit):
     before = copy.deepcopy(audit)
-    audit["findings"][0]["exception"] = {"expired": True, "reason": "test"}
+    audit["findings"][0]["exception"] = {
+        "expired": True,
+        "reason": "test",
+        "expires_at": "2000-01-01T00:00:00Z",
+    }
     assert diff_audits(before, audit)["changes"][0]["change"] == "exception_expired"
     assert not loopback("unrecognized") and loopback("::1")
 
