@@ -197,8 +197,8 @@ class Collector:
         self.ps(
             "updates.policy",
             "$r=Get-ItemProperty 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' "
-            "-ErrorAction SilentlyContinue; if($null -eq $r){[pscustomobject]@{configured=$false;"
-            "disabled=$null}}else{[pscustomobject]@{configured=$true;disabled=($r.NoAutoUpdate -eq 1)}} | ConvertTo-Json -Compress",
+            "-ErrorAction SilentlyContinue; $result=if($null -eq $r){[pscustomobject]@{configured=$false;"
+            "disabled=$null}}else{[pscustomobject]@{configured=$true;disabled=($r.NoAutoUpdate -eq 1)}}; $result | ConvertTo-Json -Compress",
         )
         if self.inventory:
             # Registry inventory is read-only; Win32_Product is deliberately avoided (it can initiate MSI repairs).

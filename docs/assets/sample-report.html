@@ -1,0 +1,469 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; connect-src 'none'">
+<title>RSAT · Endpoint security assessment</title><style>
+:root{color-scheme:light;--ink:#162338;--muted:#53647a;--line:#dbe4ed;--paper:#fff;--bg:#f0f4f8;--blue:#2464cc}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,sans-serif}
+main{max-width:1180px;margin:auto;padding:40px 28px}header{background:#13253e;color:white;padding:40px;border-radius:20px}
+.brand{color:#86c5ff;letter-spacing:.16em;font-weight:750;font-size:12px}h1{font-size:36px;line-height:1.2;margin:12px 0}
+h2{font-size:23px;margin:32px 0 14px}h3{margin:0 0 12px;font-size:18px}.subtitle{color:#c5d3e4;max-width:750px}
+.meta{display:flex;flex-wrap:wrap;gap:10px 24px;margin-top:24px;font-size:13px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:22px}
+.card,.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:22px}.metric{font-size:30px;font-weight:750;line-height:1.2}.muted{color:var(--muted)}
+.badge{font-size:11px;font-weight:750;letter-spacing:.04em;padding:5px 9px;border-radius:6px;white-space:nowrap;background:#e8edf3;color:#46566c}
+.PASS{background:#d9f4e5;color:#12603b}.FAIL{background:#ffe2e0;color:#9c2828}.UNKNOWN,.ERROR{background:#fff0cf;color:#785305}
+.severity{font-size:12px;text-transform:uppercase;color:var(--muted)}table{border-collapse:collapse;width:100%;background:white}th,td{padding:16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:#f8fafc}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:14px}details{margin-top:10px}summary{cursor:pointer;color:var(--blue)}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:#f4f7fa;padding:16px;border-radius:8px}
+.control{font-size:11px;color:var(--muted)}.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}input,select,button{font:inherit;border:1px solid var(--line);border-radius:8px;padding:10px;background:white;color:var(--ink)}input{flex:1;min-width:180px}
+button{cursor:pointer}.risk{border-left:4px solid #e59b37;margin:12px 0}.note{padding:16px 20px;background:#e4edf8;border-radius:10px}footer{font-size:12px;color:var(--muted);margin:32px 0}.bar{height:8px;background:#e4edf8;border-radius:4px;margin-top:12px}.bar span{display:block;height:100%;background:var(--blue);border-radius:4px}
+a{color:var(--blue)}header a{color:#86c5ff}@media(max-width:600px){main{padding:18px 12px}header{padding:24px}h1{font-size:28px}th,td{padding:12px}.cards{grid-template-columns:repeat(2,1fr)}}@media print{body{background:white}main{max-width:none;padding:0}.toolbar{display:none}header{border-radius:0;print-color-adjust:exact}.panel,.card,tr{break-inside:avoid}details{display:block}}
+</style></head><body><main><header><div class="brand">OFINFIX / RSAT</div><h1>Endpoint security assessment</h1>
+<p class="subtitle">Evidence you can inspect. Findings you can act on. A record you can compare.</p>
+<div class="meta"><span>Windows · 11 · 24H2 · x86_64</span>
+<span>Asset demo-workstation-01</span><span>2026-10-01T10:00:00+00:00</span></div></header>
+<section class="cards"><div class="card"><div class="muted">Controls assessed</div><div class="metric">17/25</div></div><div class="card"><div class="muted">Failed</div><div class="metric">4</div></div><div class="card"><div class="muted">Passed</div><div class="metric">13</div></div><div class="card"><div class="muted">Unknown / errors</div><div class="metric">8</div></div></section><div class="panel" style="margin-top:14px"><strong>68.0% of applicable controls assessed</strong>
+<div class="bar"><span style="width:68.0%"></span></div><p class="muted">Coverage describes this rule pack. It is not an overall security score.</p></div>
+<h2>Assessment scope</h2><p class="note">local endpoint; no external reachability verified. Unknown results identify missing evidence and require follow-up.</p>
+<h2>Prioritized review</h2><article class="panel risk"><h3>Review RDP access</h3><div class="severity">high</div><ul><li>RDP listens on a non-loopback address</li><li>The assessed firewall control failed</li><li>Network Level Authentication is disabled</li></ul><p class="muted">A listener and failed control do not prove external exposure or exploitability.</p></article>
+<h2>Control findings</h2><div class="toolbar"><input id="search" type="search" aria-label="Search findings" placeholder="Search controls or evidence">
+<select id="state" aria-label="Filter status"><option value="">All statuses</option><option>FAIL</option><option>PASS</option><option>UNKNOWN</option><option>ERROR</option><option>NOT_APPLICABLE</option></select>
+<button id="print">Print / save PDF</button></div><div class="tablewrap"><table><thead><tr><th>Control</th><th>Status</th><th>Assessment</th></tr></thead><tbody><tr data-state="FAIL"><td><div class="control">RSAT-ENC-001 · rule 2.0.0</div>
+<strong>BitLocker protection active on every fixed volume</strong><div class="severity">high</div></td>
+<td><span class="badge FAIL">FAIL</span></td>
+<td>Evidence does not satisfy the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Resume BitLocker protection after confirming firmware/update work is complete. Inspect every fixed volume.</p><a href="https://learn.microsoft.com/en-us/powershell/module/bitlocker/get-bitlockervolume" rel="noreferrer">Reference</a><pre>[
+  {
+    &quot;id&quot;: &quot;disk.encryption&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: [
+      {
+        &quot;mount&quot;: &quot;C:&quot;,
+        &quot;protection&quot;: 0,
+        &quot;percentage&quot;: 100,
+        &quot;protector_types&quot;: [
+          &quot;Tpm&quot;
+        ]
+      }
+    ]
+  }
+]</pre></details></td></tr><tr data-state="FAIL"><td><div class="control">RSAT-FW-001 · rule 2.0.0</div>
+<strong>Every Windows firewall profile enabled</strong><div class="severity">high</div></td>
+<td><span class="badge FAIL">FAIL</span></td>
+<td>Evidence does not satisfy the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Enable Domain, Private and Public firewall profiles through the owning local or central policy.</p><pre>[
+  {
+    &quot;id&quot;: &quot;firewall.profiles&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: [
+      {
+        &quot;name&quot;: &quot;Domain&quot;,
+        &quot;enabled&quot;: true,
+        &quot;default_inbound&quot;: &quot;Block&quot;,
+        &quot;log_blocked&quot;: false
+      },
+      {
+        &quot;name&quot;: &quot;Private&quot;,
+        &quot;enabled&quot;: true,
+        &quot;default_inbound&quot;: &quot;Block&quot;,
+        &quot;log_blocked&quot;: false
+      },
+      {
+        &quot;name&quot;: &quot;Public&quot;,
+        &quot;enabled&quot;: false,
+        &quot;default_inbound&quot;: &quot;Block&quot;,
+        &quot;log_blocked&quot;: false
+      }
+    ]
+  }
+]</pre></details></td></tr><tr data-state="FAIL"><td><div class="control">RSAT-FW-003 · rule 2.0.0</div>
+<strong>Windows blocked traffic logging enabled</strong><div class="severity">low</div></td>
+<td><span class="badge FAIL">FAIL</span></td>
+<td>Evidence does not satisfy the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Enable blocked traffic logging with appropriate retention and access controls.</p><pre>[
+  {
+    &quot;id&quot;: &quot;firewall.profiles&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: [
+      {
+        &quot;name&quot;: &quot;Domain&quot;,
+        &quot;enabled&quot;: true,
+        &quot;default_inbound&quot;: &quot;Block&quot;,
+        &quot;log_blocked&quot;: false
+      },
+      {
+        &quot;name&quot;: &quot;Private&quot;,
+        &quot;enabled&quot;: true,
+        &quot;default_inbound&quot;: &quot;Block&quot;,
+        &quot;log_blocked&quot;: false
+      },
+      {
+        &quot;name&quot;: &quot;Public&quot;,
+        &quot;enabled&quot;: false,
+        &quot;default_inbound&quot;: &quot;Block&quot;,
+        &quot;log_blocked&quot;: false
+      }
+    ]
+  }
+]</pre></details></td></tr><tr data-state="FAIL"><td><div class="control">RSAT-REMOTE-001 · rule 2.0.0</div>
+<strong>RDP requires Network Level Authentication</strong><div class="severity">high</div></td>
+<td><span class="badge FAIL">FAIL</span></td>
+<td>Evidence does not satisfy the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Require Network Level Authentication where RDP is permitted. Restrict network access separately.</p><pre>[
+  {
+    &quot;id&quot;: &quot;remote.rdp&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;enabled&quot;: true,
+      &quot;nla&quot;: false
+    }
+  }
+]</pre></details></td></tr><tr data-state="UNKNOWN"><td><div class="control">RSAT-BACKUP-002 · rule 2.0.0</div>
+<strong>Backup restoration independently tested</strong><div class="severity">high</div></td>
+<td><span class="badge UNKNOWN">UNKNOWN</span></td>
+<td>No evidence collected<details><summary>Evidence &amp; recommended action</summary>
+<p>Attach independent evidence of a successful restoration test; endpoint configuration alone is insufficient.</p><pre>[]</pre></details></td></tr><tr data-state="UNKNOWN"><td><div class="control">RSAT-BOOT-004 · rule 2.0.0</div>
+<strong>Virtualization-based security running</strong><div class="severity">medium</div></td>
+<td><span class="badge UNKNOWN">UNKNOWN</span></td>
+<td>No evidence collected<details><summary>Evidence &amp; recommended action</summary>
+<p>Evaluate device compatibility and enable virtualization-based security under the approved baseline.</p><pre>[]</pre></details></td></tr><tr data-state="UNKNOWN"><td><div class="control">RSAT-ID-002 · rule 2.0.0</div>
+<strong>User Account Control enabled</strong><div class="severity">high</div></td>
+<td><span class="badge UNKNOWN">UNKNOWN</span></td>
+<td>No evidence collected<details><summary>Evidence &amp; recommended action</summary>
+<p>Enable UAC in the approved local or central policy.</p><pre>[]</pre></details></td></tr><tr data-state="UNKNOWN"><td><div class="control">RSAT-ID-003 · rule 2.0.0</div>
+<strong>UAC prompts administrators</strong><div class="severity">medium</div></td>
+<td><span class="badge UNKNOWN">UNKNOWN</span></td>
+<td>No evidence collected<details><summary>Evidence &amp; recommended action</summary>
+<p>Configure administrator consent prompts according to the approved baseline.</p><pre>[]</pre></details></td></tr><tr data-state="UNKNOWN"><td><div class="control">RSAT-REMOTE-002 · rule 2.0.0</div>
+<strong>SMBv1 disabled</strong><div class="severity">high</div></td>
+<td><span class="badge UNKNOWN">UNKNOWN</span></td>
+<td>No evidence collected<details><summary>Evidence &amp; recommended action</summary>
+<p>Disable SMBv1 after checking legacy dependencies.</p><pre>[]</pre></details></td></tr><tr data-state="UNKNOWN"><td><div class="control">RSAT-REMOTE-003 · rule 2.0.0</div>
+<strong>SMB server signing required</strong><div class="severity">medium</div></td>
+<td><span class="badge UNKNOWN">UNKNOWN</span></td>
+<td>No evidence collected<details><summary>Evidence &amp; recommended action</summary>
+<p>Require SMB signing after validating compatibility and central policy.</p><pre>[]</pre></details></td></tr><tr data-state="UNKNOWN"><td><div class="control">RSAT-UPDATE-002 · rule 2.0.0</div>
+<strong>Live update search reports no available updates</strong><div class="severity">high</div></td>
+<td><span class="badge UNKNOWN">UNKNOWN</span></td>
+<td>Live update search not requested<details><summary>Evidence &amp; recommended action</summary>
+<p>Review and install applicable vendor updates. The result reflects the configured update source at the recorded search time.</p><pre>[
+  {
+    &quot;id&quot;: &quot;updates.available&quot;,
+    &quot;state&quot;: &quot;UNKNOWN&quot;,
+    &quot;reason&quot;: &quot;Live update search not requested&quot;,
+    &quot;value&quot;: null
+  }
+]</pre></details></td></tr><tr data-state="UNKNOWN"><td><div class="control">RSAT-UPDATE-003 · rule 2.0.0</div>
+<strong>Windows automatic update policy does not disable updates</strong><div class="severity">medium</div></td>
+<td><span class="badge UNKNOWN">UNKNOWN</span></td>
+<td>No evidence collected<details><summary>Evidence &amp; recommended action</summary>
+<p>Ensure effective update management is enabled. An absent policy requires separate evidence.</p><pre>[]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-AV-001 · rule 2.0.0</div>
+<strong>Antivirus enabled</strong><div class="severity">high</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.</p><pre>[
+  {
+    &quot;id&quot;: &quot;defender.status&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;AntivirusEnabled&quot;: true,
+      &quot;RealTimeProtectionEnabled&quot;: true,
+      &quot;BehaviorMonitorEnabled&quot;: true,
+      &quot;AntivirusSignatureAge&quot;: 0,
+      &quot;IsTamperProtected&quot;: true
+    }
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-AV-002 · rule 2.0.0</div>
+<strong>Real-time protection enabled</strong><div class="severity">high</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.</p><pre>[
+  {
+    &quot;id&quot;: &quot;defender.status&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;AntivirusEnabled&quot;: true,
+      &quot;RealTimeProtectionEnabled&quot;: true,
+      &quot;BehaviorMonitorEnabled&quot;: true,
+      &quot;AntivirusSignatureAge&quot;: 0,
+      &quot;IsTamperProtected&quot;: true
+    }
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-AV-003 · rule 2.0.0</div>
+<strong>Behavior monitoring enabled</strong><div class="severity">medium</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.</p><pre>[
+  {
+    &quot;id&quot;: &quot;defender.status&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;AntivirusEnabled&quot;: true,
+      &quot;RealTimeProtectionEnabled&quot;: true,
+      &quot;BehaviorMonitorEnabled&quot;: true,
+      &quot;AntivirusSignatureAge&quot;: 0,
+      &quot;IsTamperProtected&quot;: true
+    }
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-AV-004 · rule 2.0.0</div>
+<strong>Tamper protection enabled</strong><div class="severity">medium</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.</p><pre>[
+  {
+    &quot;id&quot;: &quot;defender.status&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;AntivirusEnabled&quot;: true,
+      &quot;RealTimeProtectionEnabled&quot;: true,
+      &quot;BehaviorMonitorEnabled&quot;: true,
+      &quot;AntivirusSignatureAge&quot;: 0,
+      &quot;IsTamperProtected&quot;: true
+    }
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-AV-005 · rule 2.0.0</div>
+<strong>Defender signatures no more than two days old</strong><div class="severity">medium</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Refresh antivirus signatures and check update connectivity.</p><pre>[
+  {
+    &quot;id&quot;: &quot;defender.status&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;AntivirusEnabled&quot;: true,
+      &quot;RealTimeProtectionEnabled&quot;: true,
+      &quot;BehaviorMonitorEnabled&quot;: true,
+      &quot;AntivirusSignatureAge&quot;: 0,
+      &quot;IsTamperProtected&quot;: true
+    }
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-BOOT-001 · rule 2.0.0</div>
+<strong>Secure Boot enabled</strong><div class="severity">high</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Check platform support and enable Secure Boot using vendor procedures. Preserve boot recovery access.</p><pre>[
+  {
+    &quot;id&quot;: &quot;boot.secure&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;enabled&quot;: true
+    }
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-BOOT-002 · rule 2.0.0</div>
+<strong>TPM present</strong><div class="severity">medium</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Verify that a supported TPM is available and enabled. Do not clear the TPM without recovery planning.</p><pre>[
+  {
+    &quot;id&quot;: &quot;boot.tpm&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;TpmPresent&quot;: true,
+      &quot;TpmReady&quot;: true
+    }
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-BOOT-003 · rule 2.0.0</div>
+<strong>TPM ready</strong><div class="severity">medium</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Investigate TPM readiness using vendor guidance; preserve encryption recovery access.</p><pre>[
+  {
+    &quot;id&quot;: &quot;boot.tpm&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;TpmPresent&quot;: true,
+      &quot;TpmReady&quot;: true
+    }
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-ENC-002 · rule 2.0.0</div>
+<strong>BitLocker fixed volumes fully encrypted</strong><div class="severity">high</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Enable BitLocker on applicable fixed volumes and allow encryption to complete.</p><pre>[
+  {
+    &quot;id&quot;: &quot;disk.encryption&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: [
+      {
+        &quot;mount&quot;: &quot;C:&quot;,
+        &quot;protection&quot;: 0,
+        &quot;percentage&quot;: 100,
+        &quot;protector_types&quot;: [
+          &quot;Tpm&quot;
+        ]
+      }
+    ]
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-ENC-003 · rule 2.0.0</div>
+<strong>BitLocker key protectors configured</strong><div class="severity">high</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Configure approved key protectors and verify recovery arrangements without exporting recovery secrets.</p><pre>[
+  {
+    &quot;id&quot;: &quot;disk.encryption&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: [
+      {
+        &quot;mount&quot;: &quot;C:&quot;,
+        &quot;protection&quot;: 0,
+        &quot;percentage&quot;: 100,
+        &quot;protector_types&quot;: [
+          &quot;Tpm&quot;
+        ]
+      }
+    ]
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-FW-002 · rule 2.0.0</div>
+<strong>Windows default inbound traffic blocked</strong><div class="severity">high</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Set default inbound traffic to Block for every profile; review allowed services.</p><pre>[
+  {
+    &quot;id&quot;: &quot;firewall.profiles&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: [
+      {
+        &quot;name&quot;: &quot;Domain&quot;,
+        &quot;enabled&quot;: true,
+        &quot;default_inbound&quot;: &quot;Block&quot;,
+        &quot;log_blocked&quot;: false
+      },
+      {
+        &quot;name&quot;: &quot;Private&quot;,
+        &quot;enabled&quot;: true,
+        &quot;default_inbound&quot;: &quot;Block&quot;,
+        &quot;log_blocked&quot;: false
+      },
+      {
+        &quot;name&quot;: &quot;Public&quot;,
+        &quot;enabled&quot;: false,
+        &quot;default_inbound&quot;: &quot;Block&quot;,
+        &quot;log_blocked&quot;: false
+      }
+    ]
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-ID-001 · rule 2.0.0</div>
+<strong>Windows guest account disabled</strong><div class="severity">medium</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Disable the local guest account.</p><pre>[
+  {
+    &quot;id&quot;: &quot;identity.guest&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: [
+      {
+        &quot;enabled&quot;: false
+      }
+    ]
+  }
+]</pre></details></td></tr><tr data-state="PASS"><td><div class="control">RSAT-UPDATE-001 · rule 2.0.0</div>
+<strong>No pending reboot indicator</strong><div class="severity">medium</div></td>
+<td><span class="badge PASS">PASS</span></td>
+<td>Evidence satisfies the rule<details><summary>Evidence &amp; recommended action</summary>
+<p>Schedule a reboot if required. This control does not establish patch currency.</p><pre>[
+  {
+    &quot;id&quot;: &quot;updates.reboot&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: {
+      &quot;required&quot;: false
+    }
+  }
+]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-BACKUP-001 · rule 2.0.0</div>
+<strong>Recent macOS backup evidence</strong><div class="severity">high</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Verify a recent backup and perform a separate restoration test; a backup timestamp alone does not prove recovery.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-BOOT-005 · rule 2.0.0</div>
+<strong>macOS System Integrity Protection enabled</strong><div class="severity">high</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Re-enable System Integrity Protection using Apple recovery procedures after checking device requirements.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-BOOT-006 · rule 2.0.0</div>
+<strong>macOS authenticated root enabled</strong><div class="severity">high</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Restore authenticated-root protection using supported Apple recovery procedures.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-ENC-004 · rule 2.0.0</div>
+<strong>FileVault enabled</strong><div class="severity">high</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Enable FileVault in System Settings and verify recovery arrangements.</p><pre>[
+  {
+    &quot;id&quot;: &quot;disk.encryption&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: [
+      {
+        &quot;mount&quot;: &quot;C:&quot;,
+        &quot;protection&quot;: 0,
+        &quot;percentage&quot;: 100,
+        &quot;protector_types&quot;: [
+          &quot;Tpm&quot;
+        ]
+      }
+    ]
+  }
+]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-FW-004 · rule 2.0.0</div>
+<strong>macOS application firewall enabled</strong><div class="severity">high</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Enable the macOS application firewall.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-FW-005 · rule 2.0.0</div>
+<strong>macOS firewall stealth mode enabled</strong><div class="severity">low</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Enable stealth mode if compatible with the device role.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-FW-006 · rule 2.0.0</div>
+<strong>Linux nftables input policy drops by default</strong><div class="severity">high</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Configure an appropriate nftables input policy, preserving authorized access. Other backends require separate evidence.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-ID-004 · rule 2.0.0</div>
+<strong>macOS guest account disabled</strong><div class="severity">medium</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Disable guest login unless specifically required and approved.</p><pre>[
+  {
+    &quot;id&quot;: &quot;identity.guest&quot;,
+    &quot;state&quot;: &quot;OK&quot;,
+    &quot;value&quot;: [
+      {
+        &quot;enabled&quot;: false
+      }
+    ]
+  }
+]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-ID-005 · rule 2.0.0</div>
+<strong>Only root has Linux UID zero</strong><div class="severity">high</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Investigate unexpected UID-zero accounts before changing identity configuration.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-LOG-001 · rule 2.0.0</div>
+<strong>Linux audit service active</strong><div class="severity">medium</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Install and configure auditd when required by the device baseline.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-MGMT-001 · rule 2.0.0</div>
+<strong>macOS enrolled in device management</strong><div class="severity">low</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>For managed business devices, enroll through the authorized organization. Personal devices may need a documented exception.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-REMOTE-004 · rule 2.0.0</div>
+<strong>macOS remote login disabled</strong><div class="severity">medium</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Disable remote login when unnecessary; otherwise document the approved role and SSH controls.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-REMOTE-005 · rule 2.0.0</div>
+<strong>Linux direct root SSH login disabled</strong><div class="severity">high</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Set PermitRootLogin no and validate sshd configuration and recovery access before reloading.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-REMOTE-006 · rule 2.0.0</div>
+<strong>Linux SSH password authentication disabled</strong><div class="severity">medium</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Use managed SSH keys or an approved alternative; confirm access before disabling password authentication.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-SOFT-001 · rule 2.0.0</div>
+<strong>macOS Gatekeeper enabled</strong><div class="severity">high</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Enable Gatekeeper assessment and investigate why it was disabled.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-UPDATE-004 · rule 2.0.0</div>
+<strong>macOS automatic update schedule enabled</strong><div class="severity">medium</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Enable the automatic software update schedule or document equivalent managed update controls.</p><pre>[]</pre></details></td></tr><tr data-state="NOT_APPLICABLE"><td><div class="control">RSAT-UPDATE-005 · rule 2.0.0</div>
+<strong>Linux automatic update timer present</strong><div class="severity">medium</div></td>
+<td><span class="badge NOT_APPLICABLE">NOT_APPLICABLE</span></td>
+<td>Rule does not apply to this platform<details><summary>Evidence &amp; recommended action</summary>
+<p>Configure distribution-supported automatic update scheduling or document an equivalent managed process.</p><pre>[]</pre></details></td></tr></tbody></table></div>
+<footer>RSAT 2.0.0 · Audit 0f91a5b4-a9c2-4aa4-9288-000000000001 · Finished 2026-10-01T10:00:14+00:00<br>
+This point-in-time assessment does not certify compliance or establish that an endpoint is uncompromised. Evidence may contain sensitive system information.</footer></main><script>
+const search=document.getElementById('search'), state=document.getElementById('state');
+function filter(){for(const row of document.querySelectorAll('tbody tr')){row.hidden=!(row.textContent.toLowerCase().includes(search.value.toLowerCase())&&(!state.value||row.dataset.state===state.value));}}
+search.addEventListener('input',filter);state.addEventListener('change',filter);
+document.getElementById('print').addEventListener('click',()=>window.print());
+</script></body></html>

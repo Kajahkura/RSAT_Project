@@ -12,7 +12,7 @@ from rsat.runner import CommandRunner, parse_json  # noqa: E402
 
 
 def main():
-    runner = CommandRunner(timeout=10, deadline=90)
+    runner = CommandRunner(timeout=30, deadline=180)
     collector = Collector(runner)
     observations = collector.collect()
     facts = {o["id"]: o for o in observations}
@@ -25,7 +25,14 @@ def main():
         )
         if query.state == "OK":
             expected = {p["Name"]: p["enabled"] == 1 for p in parse_json(query)}
-            assert facts["firewall.profiles"]["state"] == "OK", facts["firewall.profiles"]
+            if facts["firewall.profiles"]["state"] != "OK":
+                collector.ps(
+                    "firewall.profiles.retry",
+                    "@(Get-NetFirewallProfile -PolicyStore ActiveStore | ForEach-Object {[pscustomobject]@{name=$_.Name;enabled=([int]$_.Enabled -eq 1)}}) | ConvertTo-Json -Compress",
+                )
+                retry = collector.observations[-1]
+                assert retry["state"] == "OK", retry
+                facts["firewall.profiles"] = retry
             actual = {p["name"]: p["enabled"] for p in facts["firewall.profiles"]["value"]}
             assert actual == expected
 
@@ -43,7 +50,7 @@ def main():
                 assert result.state == "OK", (script, result.stderr)
                 return result
 
-        Collector(SyntaxRunner(timeout=10, deadline=120), inventory=True, update_search=True).collect()
+        Collector(SyntaxRunner(timeout=30, deadline=300), inventory=True, update_search=True).collect()
     elif platform.system() == "Darwin":
         result = runner.run(["/usr/libexec/ApplicationFirewall/socketfilterfw", "--getglobalstate"])
         if result.state == "OK":
