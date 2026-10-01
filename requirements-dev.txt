@@ -3,6 +3,6 @@ pytest==9.1.1
 ruff==0.16.10
 cryptography==50.0.2; sys_platform != 'darwin' or platform_machine != 'x86_64'
 pycryptodomex==3.23.0
-pytest-cov==7.0.0
+pytest-cov==7.1.0
 jsonschema==4.26.0
 regex==2026.9.29
