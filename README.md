@@ -1,122 +1,135 @@
-# RSAT - Remote Security Audit Tool
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="RSAT — Evidence. Insight. Improvement." width="100%">
+</p>
 
-RSAT is a lightweight, cross-platform security assessment instrument designed for consultants and IT professionals. It executes a "one-shot" audit of a client endpoint—detecting encryption status, network vulnerabilities, and hygiene issues—without requiring installation or pre-existing dependencies.
+<p align="center">
+  <a href="https://github.com/Kajahkura/RSAT_Project/actions/workflows/build.yml"><img src="https://github.com/Kajahkura/RSAT_Project/actions/workflows/build.yml/badge.svg" alt="Test and build"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2563eb" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/Python-3.11%2B-3776ab" alt="Python 3.11+">
+  <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-334155" alt="Windows, macOS, Linux">
+</p>
 
-The tool compiles into a standalone zero-dependency binary that generates a professional, self-contained HTML report in seconds.
+<p align="center"><strong>Portable endpoint auditing for consultants and small IT teams.</strong><br>Inspect the evidence. Prioritize the work. Verify the improvement.</p>
 
-## 🚀 Key Features
+<p align="center">
+  <a href="#quick-start">Quick start</a> · <a href="docs/usage.md">Usage guide</a> · <a href="docs/architecture.md">Architecture</a> · <a href="docs/validation.md">Validation</a> · <a href="CONTRIBUTING.md">Contribute</a>
+</p>
 
-RSAT interrogates the native OS kernel and subsystems to provide a definitive "source of truth" audit:
+RSAT is an open-source Remote Security Audit Tool that runs a bounded, read-only endpoint assessment and produces a self-contained HTML report, structured JSON, and a remediation plan. It works locally without a persistent agent or a required cloud service. Optional workflows add existing SSH/HTTPS WinRM collection, signed evidence, recipient encryption, vulnerability intelligence, and comparisons across audits.
 
-| Security Domain | Windows Checks | macOS Checks |
-| :--- | :--- | :--- |
-| **🔐 Disk Encryption** | Verifies BitLocker status, protection level, and suspension states (via PowerShell/manage-bde). | Verifies FileVault 2 status and encryption progress (via fdesetup). |
-| **🛡️ Network Defense** | Audits Windows Defender Firewall profiles (Domain, Private, Public). | Audits Application Firewall (ALF) state and Stealth Mode configuration. |
-| **📡 Port Scanning** | Multi-threaded scan of high-risk ports: 21, 22, 23, 25, 53, 80, 139, 445, 3389, 5900, 8080. Only reports Open/Exposed ports. | Same architecture using BSD Sockets. |
-| **🩹 System Hygiene** | Checks Registry for Pending Reboot flags (Windows Update/Component Based Servicing). | Checks `SoftwareUpdate.plist` for pending recommended updates. |
-| **📊 Reporting** | Generates a locally saved `Audit_Report_[Hostname].html` with embedded CSS and logic-based color coding (Pass/Fail/Warn). | Same structure. |
+## An audit you can inspect
 
-## 🏗️ Technical Architecture
+Every conclusion links to collected evidence and a versioned rule. PASS, FAIL, UNKNOWN, ERROR, and NOT_APPLICABLE remain distinct. Coverage shows how much of the applicable policy was assessed; it is not an overall security score.
 
-RSAT is engineered with a Zero-Dependency philosophy. It avoids heavy third-party libraries that bloat binary size or introduce supply chain risks.
+<img src="docs/assets/report-preview.png" alt="Synthetic RSAT report showing control coverage, contextual review, and evidence-linked findings" width="100%">
 
-### 1. Hybrid Execution Model
-The tool uses Python for control logic but outsources data gathering to native OS binaries. This ensures the audit relies on the OS's own "Source of Truth" rather than potentially outdated Python wrappers.
-* **Windows:** Uses `ctypes` to call Win32 APIs and `subprocess` to invoke PowerShell/manage-bde.
-* **macOS:** Uses `plistlib` to parse system preferences and `subprocess` to invoke fdesetup/socketfilterfw.
+*Synthetic demonstration data; no customer endpoint information is included.*
 
-### 2. Autonomous Privilege Escalation
-Security auditing requires administrative access. RSAT implements a self-elevation mechanism:
-* **Windows:** Detects privileges via `shell32.IsUserAnAdmin()`. If false, it re-launches itself using `ShellExecuteW` with the `runas` verb to trigger the UAC prompt.
-* **macOS:** Detects root via `os.getuid()`. If false, it re-launches via `os.execvp` using `sudo`, prompting the user for their password in the terminal.
+| Capability | What you get |
+|---|---|
+| **42 original controls** | Disk protection, firewall, endpoint defense, boot protections, remote access, identity, updates, backup evidence, and management checks |
+| **Traceable findings** | Stable control IDs, policy versions, collection source, outcomes, severity, and recommended actions |
+| **Contextual review** | Non-loopback service relationships, failed controls, and explainable vulnerability priority factors |
+| **Portable reporting** | Responsive standalone HTML, JSON, printing, and local multi-endpoint overview |
+| **Verifiable evidence** | SHA-256 manifests, Ed25519 signing, pinned-key verification, and X25519/AES-GCM recipient encryption |
+| **Progress tracking** | Resolved findings, regressions, policy changes, and expiring exceptions |
+| **Explicit remediation** | Manual plans plus a small allowlist with dry-run, backup, execution, verification, and rollback |
+| **Optional integrations** | osquery, existing SSH access, second-host TCP probes, offline advisories, OSV/KEV/EPSS, OSCAL, and local AI summaries |
 
-### 3. Cross-Platform Compilation
-The build system utilizes **PyInstaller** to bundle the Python interpreter and script into a single executable file (`.exe` for Windows, Mach-O binary for macOS). This eliminates the need for the client to have Python installed.
+## Quick start
 
-## 📥 Usage (For Clients)
+Use a portable binary from a verified **2.x release** when available, or run from source. The legacy 1.0 release uses less reliable checks; it does not contain the features described here.
 
-**No Python knowledge or installation is required.**
-
-1. Navigate to the **Releases** page of this repository.
-2. Download the binary for your system:
-    * Windows: `AuditTool_Windows.exe`
-    * macOS: `AuditTool_macOS`
-3. **Run with Privileges:**
-
-**Windows:**
-Right-click the file and select "Run as Administrator".
-
-**macOS:**
-Open your terminal, navigate to the download folder, and run:
 ```bash
-sudo ./AuditTool_macOS
-```
-
-> **Note:** Administrative privileges are strictly required to query BitLocker keys, Firewall profiles, and Global System Updates. The tool will auto-generate an HTML report in the same folder.
-
-## 🛠️ Development & Build Setup
-
-To contribute or build the binary locally, follow these steps.
-
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/Kajahkura/RSAT_Project.git](https://github.com/Kajahkura/RSAT_Project.git)
+git clone https://github.com/Kajahkura/RSAT_Project.git
 cd RSAT_Project
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m pip install -e .
+rsat audit
 ```
 
-### 2. Set up Virtual Environment
-```bash
-python -m venv venv
+Open `audit-output/<audit-id>/report.html`. Reports are created with unique audit IDs and do not overwrite an earlier audit.
 
-# Windows:
-venv\Scripts\activate
-
-# macOS/Linux:
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-The tool relies on the Python Standard Library (`os`, `sys`, `socket`, `subprocess`, `ctypes`) for logic. The only external dependency is PyInstaller for the build process.
+Run with the privileges appropriate for your engagement when native checks need them. RSAT does not automatically elevate or apply fixes. A completed audit can contain unknown or failed queries; review coverage and evidence.
 
 ```bash
-pip install -r requirements.txt
+# Opt into deeper inventory and bounded live update checks
+rsat audit --inventory --update-search --deadline 120 --command-timeout 20
+
+# Compare the same asset across two audits
+rsat diff before/audit.json after/audit.json --output changes.json
+
+# Create a local engagement overview
+rsat workspace laptop/audit.json workstation/audit.json --output engagement.html
 ```
 
-### 4. Run from Source
+## Platform coverage
+
+| Domain | Windows | macOS | Linux |
+|---|---|---|---|
+| Disk | BitLocker protection, encryption, protector types on fixed volumes | FileVault state and progress | Storage inventory; no generic encryption assurance claim |
+| Firewall | Effective per-profile state, inbound default, logging | Application firewall, stealth and block-all observations | nftables input policy; other backends need separate evidence |
+| Network | IPv4/IPv6 listeners, process association, UDP endpoints | TCP listeners and process association | TCP listeners and process association |
+| Endpoint and boot | Defender, signatures, TPM, Secure Boot, VBS | SIP, authenticated root, Gatekeeper | Secure Boot where supported |
+| Remote and identity | RDP NLA, SMBv1/signing, guest, UAC, administrator inventory | SSH status, guest, administrator inventory, MDM | Effective SSH configuration, UID-zero accounts |
+| Updates and recovery | Reboot indicators, installed hotfix inventory, optional live update search | Schedule, history, optional live update search, Time Machine evidence | Reboot indicator on supported distributions, update timers, audit service |
+
+Policy applicability depends on device role. Missing data does not pass. Backup timestamps do not prove successful restoration. A listening service does not establish external reachability or a vulnerability. OS support, proprietary software advisories, and organizational compliance require version-specific and external evidence.
+
+## Evidence and remediation
+
 ```bash
-python src/audit_tool.py
+python -m pip install -e '.[crypto]'
+rsat keygen keys
+rsat audit --bundle --signing-key keys/signing.key.pem --recipient-key keys/recipient.pub.pem
+rsat verify evidence.rsat.zip --trusted-key keys/signing.pub.pem
+
+rsat plan audit.json --output plan.json
+rsat apply plan.json windows-firewall-enable --backup firewall-before.json
 ```
 
-### 5. Build Binary Locally
-To create the standalone executable (frozen binary):
+`apply` defaults to dry-run. Execution is a separate opt-in with privileges and recovery-access acknowledgment. Signing verifies bytes and signer identity when the public key is pinned independently; it does not prove endpoint health. Encryption creates a transfer artifact while local plaintext outputs remain. See the [usage guide](docs/usage.md) and [security policy](SECURITY.md).
+
+## Designed for extension
+
+```mermaid
+flowchart LR
+    C[Native collectors] --> O[Observations]
+    O --> P[Versioned policies]
+    P --> F[Findings + coverage]
+    F --> R[Contextual risk]
+    R --> H[HTML / JSON / evidence bundle]
+    F --> M[Remediation + re-audit]
+```
+
+The core uses Python for audit orchestration and policies, PowerShell/CIM for Windows queries, native macOS/Linux interfaces, and HTML/CSS/JavaScript for standalone reports. Cryptography uses maintained standard primitives. The [architecture guide](docs/architecture.md) explains the module boundaries and trust model.
+
+```text
+src/rsat/       collectors, policies, analysis, reports, evidence, CLI
+tests/          regressions, integration boundaries, security cases
+scripts/        native smoke tests, packaging, release inventory
+docs/           architecture, usage, validation, design rationale
+examples/       synthetic audit, policy exceptions, advisory format
+.github/        native CI, issue and PR templates, dependency updates
+```
+
+## Test and build
 
 ```bash
-pyinstaller --onefile --console --clean --name AuditTool_Local src/audit_tool.py
+python -m pip install -r requirements-dev.txt -e .
+python -m ruff check src tests scripts
+python -m pytest --cov=rsat --cov-fail-under=80
+python scripts/native_smoke.py
+python scripts/build.py
 ```
-The executable will appear in the `dist/` folder.
 
-## ⚙️ CI/CD Pipeline
+CI runs Python 3.11/3.13 tests on Linux, Windows, and both macOS architectures, then builds and smoke-tests standalone executables. Tagged releases publish checksums, build-environment inventories, and provenance. OS Authenticode signing and Apple notarization require maintainer certificates and are not currently configured. See [validation](docs/validation.md) for measured results and limits.
 
-This project utilizes GitHub Actions for automated cross-platform compilation.
+## Open source, throughout
 
-* **Workflow File:** `.github/workflows/build.yml`
-* **Trigger:** The build pipeline runs automatically when a new tag (e.g., `v1.0.0`) is pushed.
-* **Matrix Strategy:** Builds simultaneously on `windows-latest` and `macos-latest` runners to ensure native binary compatibility.
+RSAT code, original controls, reports, advanced analysis, and repository artwork use the [MIT license](LICENSE). There is no proprietary feature tier. Hosting, support, training, and consulting can support the project without closing its implementation.
 
-## ⚠️ Disclaimer
+Optional tools, intelligence data, and local models retain their own licenses. No restricted CIS benchmark text is bundled. See [third-party notices](docs/third-party-notices.md), [contributor guidance](CONTRIBUTING.md), and the [changelog](CHANGELOG.md).
 
-**This tool is for authorized security auditing purposes only.**
-
-Port scanning and security enumeration without permission may be illegal in certain jurisdictions. The author assumes no liability for the misuse of this software or for any damage caused by the software. Always ensure you have explicit permission from the system owner before running this tool.
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-**Copyright (c) 2025 OFINFIX**
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+RSAT is a point-in-time assessment tool for authorized use. It does not certify compliance, detect every vulnerability, or establish that an endpoint is uncompromised.

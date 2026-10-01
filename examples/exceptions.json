@@ -1,0 +1,7 @@
+[
+  {
+    "control_id": "RSAT-REMOTE-004",
+    "reason": "Approved SSH administration role; review independent authentication and access controls",
+    "expires_at": "2026-12-31T23:59:59Z"
+  }
+]

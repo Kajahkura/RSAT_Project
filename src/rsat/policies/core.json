@@ -1,0 +1,649 @@
+{
+  "schema_version": "1.0",
+  "id": "rsat-core",
+  "version": "2.0.0",
+  "license": "MIT",
+  "description": "Original RSAT controls. Applicability depends on device role; no compliance certification is implied.",
+  "rules": [
+    {
+      "id": "RSAT-ENC-001",
+      "title": "BitLocker protection active on every fixed volume",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "disk.encryption",
+      "path": "protection",
+      "operator": "eq",
+      "expected": 1,
+      "severity": "high",
+      "remediation": "Resume BitLocker protection after confirming firmware/update work is complete. Inspect every fixed volume.",
+      "mode": "all",
+      "references": [
+        "https://learn.microsoft.com/en-us/powershell/module/bitlocker/get-bitlockervolume"
+      ]
+    },
+    {
+      "id": "RSAT-ENC-002",
+      "title": "BitLocker fixed volumes fully encrypted",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "disk.encryption",
+      "path": "percentage",
+      "operator": "eq",
+      "expected": 100,
+      "severity": "high",
+      "remediation": "Enable BitLocker on applicable fixed volumes and allow encryption to complete.",
+      "mode": "all",
+      "references": []
+    },
+    {
+      "id": "RSAT-ENC-003",
+      "title": "BitLocker key protectors configured",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "disk.encryption",
+      "path": "protector_types",
+      "operator": "nonempty",
+      "expected": null,
+      "severity": "high",
+      "remediation": "Configure approved key protectors and verify recovery arrangements without exporting recovery secrets.",
+      "mode": "all",
+      "references": []
+    },
+    {
+      "id": "RSAT-ENC-004",
+      "title": "FileVault enabled",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "disk.encryption",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Enable FileVault in System Settings and verify recovery arrangements.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-FW-001",
+      "title": "Every Windows firewall profile enabled",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "firewall.profiles",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Enable Domain, Private and Public firewall profiles through the owning local or central policy.",
+      "mode": "all",
+      "references": []
+    },
+    {
+      "id": "RSAT-FW-002",
+      "title": "Windows default inbound traffic blocked",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "firewall.profiles",
+      "path": "default_inbound",
+      "operator": "eq",
+      "expected": "Block",
+      "severity": "high",
+      "remediation": "Set default inbound traffic to Block for every profile; review allowed services.",
+      "mode": "all",
+      "references": []
+    },
+    {
+      "id": "RSAT-FW-003",
+      "title": "Windows blocked traffic logging enabled",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "firewall.profiles",
+      "path": "log_blocked",
+      "operator": "eq",
+      "expected": true,
+      "severity": "low",
+      "remediation": "Enable blocked traffic logging with appropriate retention and access controls.",
+      "mode": "all",
+      "references": []
+    },
+    {
+      "id": "RSAT-FW-004",
+      "title": "macOS application firewall enabled",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "firewall.global",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Enable the macOS application firewall.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-FW-005",
+      "title": "macOS firewall stealth mode enabled",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "firewall.stealth",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "low",
+      "remediation": "Enable stealth mode if compatible with the device role.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-FW-006",
+      "title": "Linux nftables input policy drops by default",
+      "platforms": [
+        "Linux"
+      ],
+      "observation": "firewall.rules",
+      "path": "default_drop",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Configure an appropriate nftables input policy, preserving authorized access. Other backends require separate evidence.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-AV-001",
+      "title": "Antivirus enabled",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "defender.status",
+      "path": "AntivirusEnabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-AV-002",
+      "title": "Real-time protection enabled",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "defender.status",
+      "path": "RealTimeProtectionEnabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-AV-003",
+      "title": "Behavior monitoring enabled",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "defender.status",
+      "path": "BehaviorMonitorEnabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "medium",
+      "remediation": "Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-AV-004",
+      "title": "Tamper protection enabled",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "defender.status",
+      "path": "IsTamperProtected",
+      "operator": "eq",
+      "expected": true,
+      "severity": "medium",
+      "remediation": "Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-AV-005",
+      "title": "Defender signatures no more than two days old",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "defender.status",
+      "path": "AntivirusSignatureAge",
+      "operator": "le",
+      "expected": 2,
+      "severity": "medium",
+      "remediation": "Refresh antivirus signatures and check update connectivity.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-BOOT-001",
+      "title": "Secure Boot enabled",
+      "platforms": [
+        "Windows",
+        "Linux"
+      ],
+      "observation": "boot.secure",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Check platform support and enable Secure Boot using vendor procedures. Preserve boot recovery access.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-BOOT-002",
+      "title": "TPM present",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "boot.tpm",
+      "path": "TpmPresent",
+      "operator": "eq",
+      "expected": true,
+      "severity": "medium",
+      "remediation": "Verify that a supported TPM is available and enabled. Do not clear the TPM without recovery planning.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-BOOT-003",
+      "title": "TPM ready",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "boot.tpm",
+      "path": "TpmReady",
+      "operator": "eq",
+      "expected": true,
+      "severity": "medium",
+      "remediation": "Investigate TPM readiness using vendor guidance; preserve encryption recovery access.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-BOOT-004",
+      "title": "Virtualization-based security running",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "boot.vbs",
+      "path": "VirtualizationBasedSecurityStatus",
+      "operator": "eq",
+      "expected": 2,
+      "severity": "medium",
+      "remediation": "Evaluate device compatibility and enable virtualization-based security under the approved baseline.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-BOOT-005",
+      "title": "macOS System Integrity Protection enabled",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "boot.sip",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Re-enable System Integrity Protection using Apple recovery procedures after checking device requirements.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-BOOT-006",
+      "title": "macOS authenticated root enabled",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "boot.authenticated_root",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Restore authenticated-root protection using supported Apple recovery procedures.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-SOFT-001",
+      "title": "macOS Gatekeeper enabled",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "software.gatekeeper",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Enable Gatekeeper assessment and investigate why it was disabled.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-REMOTE-001",
+      "title": "RDP requires Network Level Authentication",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "remote.rdp",
+      "path": "nla",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Require Network Level Authentication where RDP is permitted. Restrict network access separately.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-REMOTE-002",
+      "title": "SMBv1 disabled",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "network.smb",
+      "path": "EnableSMB1Protocol",
+      "operator": "eq",
+      "expected": false,
+      "severity": "high",
+      "remediation": "Disable SMBv1 after checking legacy dependencies.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-REMOTE-003",
+      "title": "SMB server signing required",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "network.smb",
+      "path": "RequireSecuritySignature",
+      "operator": "eq",
+      "expected": true,
+      "severity": "medium",
+      "remediation": "Require SMB signing after validating compatibility and central policy.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-REMOTE-004",
+      "title": "macOS remote login disabled",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "remote.ssh",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": false,
+      "severity": "medium",
+      "remediation": "Disable remote login when unnecessary; otherwise document the approved role and SSH controls.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-REMOTE-005",
+      "title": "Linux direct root SSH login disabled",
+      "platforms": [
+        "Linux"
+      ],
+      "observation": "remote.ssh",
+      "path": "permit_root",
+      "operator": "eq",
+      "expected": "no",
+      "severity": "high",
+      "remediation": "Set PermitRootLogin no and validate sshd configuration and recovery access before reloading.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-REMOTE-006",
+      "title": "Linux SSH password authentication disabled",
+      "platforms": [
+        "Linux"
+      ],
+      "observation": "remote.ssh",
+      "path": "password_auth",
+      "operator": "eq",
+      "expected": "no",
+      "severity": "medium",
+      "remediation": "Use managed SSH keys or an approved alternative; confirm access before disabling password authentication.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-ID-001",
+      "title": "Windows guest account disabled",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "identity.guest",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": false,
+      "severity": "medium",
+      "remediation": "Disable the local guest account.",
+      "mode": "all",
+      "references": []
+    },
+    {
+      "id": "RSAT-ID-002",
+      "title": "User Account Control enabled",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "identity.uac",
+      "path": "EnableLUA",
+      "operator": "eq",
+      "expected": 1,
+      "severity": "high",
+      "remediation": "Enable UAC in the approved local or central policy.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-ID-003",
+      "title": "UAC prompts administrators",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "identity.uac",
+      "path": "ConsentPromptBehaviorAdmin",
+      "operator": "ne",
+      "expected": 0,
+      "severity": "medium",
+      "remediation": "Configure administrator consent prompts according to the approved baseline.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-ID-004",
+      "title": "macOS guest account disabled",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "identity.guest",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": false,
+      "severity": "medium",
+      "remediation": "Disable guest login unless specifically required and approved.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-ID-005",
+      "title": "Only root has Linux UID zero",
+      "platforms": [
+        "Linux"
+      ],
+      "observation": "identity.uid0",
+      "path": "accounts",
+      "operator": "eq",
+      "expected": [
+        "root"
+      ],
+      "severity": "high",
+      "remediation": "Investigate unexpected UID-zero accounts before changing identity configuration.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-UPDATE-001",
+      "title": "No pending reboot indicator",
+      "platforms": [
+        "Windows",
+        "Darwin",
+        "Linux"
+      ],
+      "observation": "updates.reboot",
+      "path": "required",
+      "operator": "eq",
+      "expected": false,
+      "severity": "medium",
+      "remediation": "Schedule a reboot if required. This control does not establish patch currency.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-UPDATE-002",
+      "title": "Live update search reports no available updates",
+      "platforms": [
+        "Windows",
+        "Darwin"
+      ],
+      "observation": "updates.available",
+      "path": "count",
+      "operator": "eq",
+      "expected": 0,
+      "severity": "high",
+      "remediation": "Review and install applicable vendor updates. The result reflects the configured update source at the recorded search time.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-UPDATE-003",
+      "title": "Windows automatic update policy does not disable updates",
+      "platforms": [
+        "Windows"
+      ],
+      "observation": "updates.policy",
+      "path": "disabled",
+      "operator": "eq",
+      "expected": false,
+      "severity": "medium",
+      "remediation": "Ensure effective update management is enabled. An absent policy requires separate evidence.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-UPDATE-004",
+      "title": "macOS automatic update schedule enabled",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "updates.policy",
+      "path": "enabled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "medium",
+      "remediation": "Enable the automatic software update schedule or document equivalent managed update controls.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-UPDATE-005",
+      "title": "Linux automatic update timer present",
+      "platforms": [
+        "Linux"
+      ],
+      "observation": "updates.timers",
+      "path": "automatic_update_timer",
+      "operator": "eq",
+      "expected": true,
+      "severity": "medium",
+      "remediation": "Configure distribution-supported automatic update scheduling or document an equivalent managed process.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-LOG-001",
+      "title": "Linux audit service active",
+      "platforms": [
+        "Linux"
+      ],
+      "observation": "logging.auditd",
+      "path": "active",
+      "operator": "eq",
+      "expected": true,
+      "severity": "medium",
+      "remediation": "Install and configure auditd when required by the device baseline.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-BACKUP-001",
+      "title": "Recent macOS backup evidence",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "backup.status",
+      "path": "age_days",
+      "operator": "le",
+      "expected": 7,
+      "severity": "high",
+      "remediation": "Verify a recent backup and perform a separate restoration test; a backup timestamp alone does not prove recovery.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-BACKUP-002",
+      "title": "Backup restoration independently tested",
+      "platforms": [
+        "Windows",
+        "Darwin",
+        "Linux"
+      ],
+      "observation": "backup.status",
+      "path": "restore_tested",
+      "operator": "eq",
+      "expected": true,
+      "severity": "high",
+      "remediation": "Attach independent evidence of a successful restoration test; endpoint configuration alone is insufficient.",
+      "mode": "scalar",
+      "references": []
+    },
+    {
+      "id": "RSAT-MGMT-001",
+      "title": "macOS enrolled in device management",
+      "platforms": [
+        "Darwin"
+      ],
+      "observation": "management.status",
+      "path": "mdm_enrolled",
+      "operator": "eq",
+      "expected": true,
+      "severity": "low",
+      "remediation": "For managed business devices, enroll through the authorized organization. Personal devices may need a documented exception.",
+      "mode": "scalar",
+      "references": []
+    }
+  ]
+}

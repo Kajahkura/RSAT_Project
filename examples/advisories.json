@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-01T00:00:00Z",
+  "description": "Synthetic format example. Replace with verified vendor advisories; this is not real vulnerability intelligence.",
+  "advisories": [
+    {
+      "id": "EXAMPLE-ADVISORY-001",
+      "name": "Example Application",
+      "ecosystem": "Windows",
+      "affected_versions": ["1.0.0"],
+      "known_exploited": false,
+      "references": ["https://example.com/advisory"]
+    }
+  ]
+}

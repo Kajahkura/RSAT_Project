@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="350" viewBox="0 0 1200 350" role="img" aria-labelledby="title desc">
+<title id="title">RSAT — Evidence. Insight. Improvement.</title><desc id="desc">Portable open-source endpoint security auditing for Windows, macOS, and Linux.</desc>
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0d1c31"/><stop offset="1" stop-color="#203e61"/></linearGradient><linearGradient id="shield" x2="0" y2="1"><stop stop-color="#83cbff"/><stop offset="1" stop-color="#458ce2"/></linearGradient></defs>
+<rect width="1200" height="350" rx="24" fill="url(#bg)"/>
+<g fill="none" stroke="#8bc8ff" opacity=".13"><path d="M790 0v350M870 0v350M950 0v350M1030 0v350M1110 0v350M710 70h490M710 150h490M710 230h490M710 310h490"/><circle cx="982" cy="175" r="116"/><circle cx="982" cy="175" r="145"/></g>
+<text x="64" y="77" fill="#8bc8ff" font-family="system-ui,sans-serif" font-size="15" letter-spacing="4">OFINFIX / OPEN SOURCE SECURITY</text>
+<text x="59" y="173" fill="#fff" font-family="system-ui,sans-serif" font-size="88" font-weight="750" letter-spacing="-3">RSAT</text>
+<text x="64" y="226" fill="#e0ebf8" font-family="system-ui,sans-serif" font-size="27">Evidence. Insight. Improvement.</text>
+<text x="64" y="272" fill="#b1c5dc" font-family="system-ui,sans-serif" font-size="18">Portable endpoint audits · Windows / macOS / Linux</text>
+<path d="M982 75l80 30v73c0 56-35 93-80 113-45-20-80-57-80-113v-73z" fill="#183755" stroke="url(#shield)" stroke-width="4"/>
+<path d="M944 173l25 26 52-55" fill="none" stroke="#9ad9ff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="802" cy="94" r="5" fill="#8bc8ff"/><circle cx="1130" cy="261" r="5" fill="#8bc8ff"/>
+</svg>

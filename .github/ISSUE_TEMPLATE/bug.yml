@@ -1,0 +1,19 @@
+name: Incorrect audit result
+description: Report a reproducible interpretation or execution problem without client secrets
+body:
+  - type: textarea
+    attributes:
+      label: Result and expected behavior
+      description: Include control ID and sanitized evidence; do not upload a full client audit.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: RSAT version, OS/build, architecture, and privilege level
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction and independent native verification
+    validations:
+      required: true

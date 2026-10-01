@@ -7,4 +7,15 @@ dist/
 *.html
 venv/
 .DS_Store
-
+.venv/
+.venv313/
+.venv311/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+audit-output/
+*.rsat.zip
+*.rsat.enc
+*.pem
+coverage.xml
+.coverage
