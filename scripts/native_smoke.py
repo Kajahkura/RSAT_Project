@@ -59,4 +59,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as exc:
+        # Preserve actionable native failures as GitHub annotations, as well as log output.
+        message = str(exc).replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+        print(f"::error::{type(exc).__name__}: {message}", flush=True)
+        raise
