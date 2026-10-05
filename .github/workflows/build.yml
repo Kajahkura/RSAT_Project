@@ -74,6 +74,7 @@ jobs:
           name: RSAT-web-verified
           path: |
             web/RSAT-web-workspace.zip
+            web/RSAT-web-SHA256SUMS.txt
             docs/assets/workspace-*.png
 
   build:

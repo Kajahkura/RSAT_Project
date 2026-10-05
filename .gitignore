@@ -34,3 +34,5 @@ pytest-results.xml
 !web/index.html
 
 web/RSAT-web-workspace.zip
+
+web/RSAT-web-SHA256SUMS.txt
