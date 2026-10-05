@@ -9,6 +9,7 @@ import platform
 import uuid
 
 from . import __version__
+from .context import environment_context
 
 SCHEMA_VERSION = "2.0"
 STATES = {"PASS", "FAIL", "UNKNOWN", "ERROR", "NOT_APPLICABLE"}
@@ -49,6 +50,7 @@ class Finding:
 
 def new_audit(asset_salt="", include_hostname=False):
     hostname = platform.node()
+    context = environment_context()
     # A salt is required for linking assets across engagements without publishing hostnames.
     asset_id = (
         hmac.new(asset_salt.encode(), hostname.encode(), hashlib.sha256).hexdigest()
@@ -68,7 +70,8 @@ def new_audit(asset_salt="", include_hostname=False):
         "architecture": platform.machine(),
         "started_at": utcnow(),
         "finished_at": None,
-        "scope": "local endpoint; no external reachability verified",
+        "scope": context["scope"],
+        "environment": context,
         "observations": [],
         "findings": [],
         "risks": [],

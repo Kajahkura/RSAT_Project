@@ -19,3 +19,10 @@ audit-output/
 *.pem
 coverage.xml
 .coverage
+
+# Browser build and private evidence stores
+web/node_modules/
+web/dist/
+.blinkhost/
+*.db
+*.db-journal

@@ -1,0 +1,24 @@
+schema: blinkhost/v1
+application:
+  root: .
+frontend:
+  root: .
+  dependency_root: .
+  framework: react
+  package_manager: npm
+  install: npm ci
+  build: npm run build
+  dev: npm run dev
+  output: dist
+modules: []
+resources:
+  databases: []
+  secrets: []
+preview:
+  enabled: true
+  database_mode: none
+ignore:
+  - node_modules
+  - dist
+  - .blinkhost
+  - tests

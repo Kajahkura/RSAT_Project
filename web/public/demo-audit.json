@@ -1,0 +1,701 @@
+{
+  "architecture": "x86_64",
+  "asset_id": "synthetic-demo-endpoint",
+  "asset_id_scope": "engagement",
+  "audit_id": "0f91a5b4-a9c2-4aa4-9288-000000000001",
+  "collector_version": "2.0.0",
+  "coverage": {
+    "ERROR": 0,
+    "FAIL": 4,
+    "NOT_APPLICABLE": 17,
+    "PASS": 13,
+    "UNKNOWN": 8,
+    "applicable": 25,
+    "assessed": 17,
+    "assessed_percent": 68.0
+  },
+  "findings": [
+    {
+      "details": "Evidence does not satisfy the rule",
+      "evidence_ids": [
+        "disk.encryption"
+      ],
+      "exception": null,
+      "id": "RSAT-ENC-001",
+      "references": [
+        "https://learn.microsoft.com/en-us/powershell/module/bitlocker/get-bitlockervolume"
+      ],
+      "remediation": "Resume BitLocker protection after confirming firmware/update work is complete. Inspect every fixed volume.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "FAIL",
+      "title": "BitLocker protection active on every fixed volume"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "disk.encryption"
+      ],
+      "exception": null,
+      "id": "RSAT-ENC-002",
+      "references": [],
+      "remediation": "Enable BitLocker on applicable fixed volumes and allow encryption to complete.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "PASS",
+      "title": "BitLocker fixed volumes fully encrypted"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "disk.encryption"
+      ],
+      "exception": null,
+      "id": "RSAT-ENC-003",
+      "references": [],
+      "remediation": "Configure approved key protectors and verify recovery arrangements without exporting recovery secrets.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "PASS",
+      "title": "BitLocker key protectors configured"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [
+        "disk.encryption"
+      ],
+      "exception": null,
+      "id": "RSAT-ENC-004",
+      "references": [],
+      "remediation": "Enable FileVault in System Settings and verify recovery arrangements.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "NOT_APPLICABLE",
+      "title": "FileVault enabled"
+    },
+    {
+      "details": "Evidence does not satisfy the rule",
+      "evidence_ids": [
+        "firewall.profiles"
+      ],
+      "exception": null,
+      "id": "RSAT-FW-001",
+      "references": [],
+      "remediation": "Enable Domain, Private and Public firewall profiles through the owning local or central policy.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "FAIL",
+      "title": "Every Windows firewall profile enabled"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "firewall.profiles"
+      ],
+      "exception": null,
+      "id": "RSAT-FW-002",
+      "references": [],
+      "remediation": "Set default inbound traffic to Block for every profile; review allowed services.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "PASS",
+      "title": "Windows default inbound traffic blocked"
+    },
+    {
+      "details": "Evidence does not satisfy the rule",
+      "evidence_ids": [
+        "firewall.profiles"
+      ],
+      "exception": null,
+      "id": "RSAT-FW-003",
+      "references": [],
+      "remediation": "Enable blocked traffic logging with appropriate retention and access controls.",
+      "rule_version": "2.0.0",
+      "severity": "low",
+      "status": "FAIL",
+      "title": "Windows blocked traffic logging enabled"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-FW-004",
+      "references": [],
+      "remediation": "Enable the macOS application firewall.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "NOT_APPLICABLE",
+      "title": "macOS application firewall enabled"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-FW-005",
+      "references": [],
+      "remediation": "Enable stealth mode if compatible with the device role.",
+      "rule_version": "2.0.0",
+      "severity": "low",
+      "status": "NOT_APPLICABLE",
+      "title": "macOS firewall stealth mode enabled"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-FW-006",
+      "references": [],
+      "remediation": "Configure an appropriate nftables input policy, preserving authorized access. Other backends require separate evidence.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "NOT_APPLICABLE",
+      "title": "Linux nftables input policy drops by default"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "defender.status"
+      ],
+      "exception": null,
+      "id": "RSAT-AV-001",
+      "references": [],
+      "remediation": "Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "PASS",
+      "title": "Antivirus enabled"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "defender.status"
+      ],
+      "exception": null,
+      "id": "RSAT-AV-002",
+      "references": [],
+      "remediation": "Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "PASS",
+      "title": "Real-time protection enabled"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "defender.status"
+      ],
+      "exception": null,
+      "id": "RSAT-AV-003",
+      "references": [],
+      "remediation": "Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "PASS",
+      "title": "Behavior monitoring enabled"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "defender.status"
+      ],
+      "exception": null,
+      "id": "RSAT-AV-004",
+      "references": [],
+      "remediation": "Verify the approved endpoint protection product and its effective policy. If another product is installed, document supporting evidence and an exception.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "PASS",
+      "title": "Tamper protection enabled"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "defender.status"
+      ],
+      "exception": null,
+      "id": "RSAT-AV-005",
+      "references": [],
+      "remediation": "Refresh antivirus signatures and check update connectivity.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "PASS",
+      "title": "Defender signatures no more than two days old"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "boot.secure"
+      ],
+      "exception": null,
+      "id": "RSAT-BOOT-001",
+      "references": [],
+      "remediation": "Check platform support and enable Secure Boot using vendor procedures. Preserve boot recovery access.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "PASS",
+      "title": "Secure Boot enabled"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "boot.tpm"
+      ],
+      "exception": null,
+      "id": "RSAT-BOOT-002",
+      "references": [],
+      "remediation": "Verify that a supported TPM is available and enabled. Do not clear the TPM without recovery planning.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "PASS",
+      "title": "TPM present"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "boot.tpm"
+      ],
+      "exception": null,
+      "id": "RSAT-BOOT-003",
+      "references": [],
+      "remediation": "Investigate TPM readiness using vendor guidance; preserve encryption recovery access.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "PASS",
+      "title": "TPM ready"
+    },
+    {
+      "details": "No evidence collected",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-BOOT-004",
+      "references": [],
+      "remediation": "Evaluate device compatibility and enable virtualization-based security under the approved baseline.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "UNKNOWN",
+      "title": "Virtualization-based security running"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-BOOT-005",
+      "references": [],
+      "remediation": "Re-enable System Integrity Protection using Apple recovery procedures after checking device requirements.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "NOT_APPLICABLE",
+      "title": "macOS System Integrity Protection enabled"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-BOOT-006",
+      "references": [],
+      "remediation": "Restore authenticated-root protection using supported Apple recovery procedures.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "NOT_APPLICABLE",
+      "title": "macOS authenticated root enabled"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-SOFT-001",
+      "references": [],
+      "remediation": "Enable Gatekeeper assessment and investigate why it was disabled.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "NOT_APPLICABLE",
+      "title": "macOS Gatekeeper enabled"
+    },
+    {
+      "details": "Evidence does not satisfy the rule",
+      "evidence_ids": [
+        "remote.rdp"
+      ],
+      "exception": null,
+      "id": "RSAT-REMOTE-001",
+      "references": [],
+      "remediation": "Require Network Level Authentication where RDP is permitted. Restrict network access separately.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "FAIL",
+      "title": "RDP requires Network Level Authentication"
+    },
+    {
+      "details": "No evidence collected",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-REMOTE-002",
+      "references": [],
+      "remediation": "Disable SMBv1 after checking legacy dependencies.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "UNKNOWN",
+      "title": "SMBv1 disabled"
+    },
+    {
+      "details": "No evidence collected",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-REMOTE-003",
+      "references": [],
+      "remediation": "Require SMB signing after validating compatibility and central policy.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "UNKNOWN",
+      "title": "SMB server signing required"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-REMOTE-004",
+      "references": [],
+      "remediation": "Disable remote login when unnecessary; otherwise document the approved role and SSH controls.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "NOT_APPLICABLE",
+      "title": "macOS remote login disabled"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-REMOTE-005",
+      "references": [],
+      "remediation": "Set PermitRootLogin no and validate sshd configuration and recovery access before reloading.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "NOT_APPLICABLE",
+      "title": "Linux direct root SSH login disabled"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-REMOTE-006",
+      "references": [],
+      "remediation": "Use managed SSH keys or an approved alternative; confirm access before disabling password authentication.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "NOT_APPLICABLE",
+      "title": "Linux SSH password authentication disabled"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "identity.guest"
+      ],
+      "exception": null,
+      "id": "RSAT-ID-001",
+      "references": [],
+      "remediation": "Disable the local guest account.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "PASS",
+      "title": "Windows guest account disabled"
+    },
+    {
+      "details": "No evidence collected",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-ID-002",
+      "references": [],
+      "remediation": "Enable UAC in the approved local or central policy.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "UNKNOWN",
+      "title": "User Account Control enabled"
+    },
+    {
+      "details": "No evidence collected",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-ID-003",
+      "references": [],
+      "remediation": "Configure administrator consent prompts according to the approved baseline.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "UNKNOWN",
+      "title": "UAC prompts administrators"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [
+        "identity.guest"
+      ],
+      "exception": null,
+      "id": "RSAT-ID-004",
+      "references": [],
+      "remediation": "Disable guest login unless specifically required and approved.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "NOT_APPLICABLE",
+      "title": "macOS guest account disabled"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-ID-005",
+      "references": [],
+      "remediation": "Investigate unexpected UID-zero accounts before changing identity configuration.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "NOT_APPLICABLE",
+      "title": "Only root has Linux UID zero"
+    },
+    {
+      "details": "Evidence satisfies the rule",
+      "evidence_ids": [
+        "updates.reboot"
+      ],
+      "exception": null,
+      "id": "RSAT-UPDATE-001",
+      "references": [],
+      "remediation": "Schedule a reboot if required. This control does not establish patch currency.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "PASS",
+      "title": "No pending reboot indicator"
+    },
+    {
+      "details": "Live update search not requested",
+      "evidence_ids": [
+        "updates.available"
+      ],
+      "exception": null,
+      "id": "RSAT-UPDATE-002",
+      "references": [],
+      "remediation": "Review and install applicable vendor updates. The result reflects the configured update source at the recorded search time.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "UNKNOWN",
+      "title": "Live update search reports no available updates"
+    },
+    {
+      "details": "No evidence collected",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-UPDATE-003",
+      "references": [],
+      "remediation": "Ensure effective update management is enabled. An absent policy requires separate evidence.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "UNKNOWN",
+      "title": "Windows automatic update policy does not disable updates"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-UPDATE-004",
+      "references": [],
+      "remediation": "Enable the automatic software update schedule or document equivalent managed update controls.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "NOT_APPLICABLE",
+      "title": "macOS automatic update schedule enabled"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-UPDATE-005",
+      "references": [],
+      "remediation": "Configure distribution-supported automatic update scheduling or document an equivalent managed process.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "NOT_APPLICABLE",
+      "title": "Linux automatic update timer present"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-LOG-001",
+      "references": [],
+      "remediation": "Install and configure auditd when required by the device baseline.",
+      "rule_version": "2.0.0",
+      "severity": "medium",
+      "status": "NOT_APPLICABLE",
+      "title": "Linux audit service active"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-BACKUP-001",
+      "references": [],
+      "remediation": "Verify a recent backup and perform a separate restoration test; a backup timestamp alone does not prove recovery.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "NOT_APPLICABLE",
+      "title": "Recent macOS backup evidence"
+    },
+    {
+      "details": "No evidence collected",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-BACKUP-002",
+      "references": [],
+      "remediation": "Attach independent evidence of a successful restoration test; endpoint configuration alone is insufficient.",
+      "rule_version": "2.0.0",
+      "severity": "high",
+      "status": "UNKNOWN",
+      "title": "Backup restoration independently tested"
+    },
+    {
+      "details": "Rule does not apply to this platform",
+      "evidence_ids": [],
+      "exception": null,
+      "id": "RSAT-MGMT-001",
+      "references": [],
+      "remediation": "For managed business devices, enroll through the authorized organization. Personal devices may need a documented exception.",
+      "rule_version": "2.0.0",
+      "severity": "low",
+      "status": "NOT_APPLICABLE",
+      "title": "macOS enrolled in device management"
+    }
+  ],
+  "finished_at": "2026-10-01T10:00:14+00:00",
+  "hostname": null,
+  "observations": [
+    {
+      "id": "disk.encryption",
+      "state": "OK",
+      "value": [
+        {
+          "mount": "C:",
+          "percentage": 100,
+          "protection": 0,
+          "protector_types": [
+            "Tpm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "firewall.profiles",
+      "state": "OK",
+      "value": [
+        {
+          "default_inbound": "Block",
+          "enabled": true,
+          "log_blocked": false,
+          "name": "Domain"
+        },
+        {
+          "default_inbound": "Block",
+          "enabled": true,
+          "log_blocked": false,
+          "name": "Private"
+        },
+        {
+          "default_inbound": "Block",
+          "enabled": false,
+          "log_blocked": false,
+          "name": "Public"
+        }
+      ]
+    },
+    {
+      "id": "remote.rdp",
+      "state": "OK",
+      "value": {
+        "enabled": true,
+        "nla": false
+      }
+    },
+    {
+      "id": "network.listeners",
+      "state": "OK",
+      "value": [
+        {
+          "address": "0.0.0.0",
+          "pid": 1092,
+          "port": 3389,
+          "process": "svchost"
+        }
+      ]
+    },
+    {
+      "id": "defender.status",
+      "state": "OK",
+      "value": {
+        "AntivirusEnabled": true,
+        "AntivirusSignatureAge": 0,
+        "BehaviorMonitorEnabled": true,
+        "IsTamperProtected": true,
+        "RealTimeProtectionEnabled": true
+      }
+    },
+    {
+      "id": "boot.secure",
+      "state": "OK",
+      "value": {
+        "enabled": true
+      }
+    },
+    {
+      "id": "boot.tpm",
+      "state": "OK",
+      "value": {
+        "TpmPresent": true,
+        "TpmReady": true
+      }
+    },
+    {
+      "id": "identity.guest",
+      "state": "OK",
+      "value": [
+        {
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "id": "updates.reboot",
+      "state": "OK",
+      "value": {
+        "required": false
+      }
+    },
+    {
+      "id": "updates.available",
+      "reason": "Live update search not requested",
+      "state": "UNKNOWN",
+      "value": null
+    }
+  ],
+  "os_release": "11 \u00b7 24H2",
+  "platform": "Windows",
+  "risks": [
+    {
+      "evidence_ids": [
+        "firewall.profiles",
+        "network.listeners",
+        "remote.rdp"
+      ],
+      "factors": [
+        "RDP listens on a non-loopback address",
+        "The assessed firewall control failed",
+        "Network Level Authentication is disabled"
+      ],
+      "id": "RSAT-RISK-LISTENER-0.0.0.0-3389",
+      "limitations": "A listener and failed control do not prove external exposure or exploitability.",
+      "reachability": "not verified",
+      "severity": "high",
+      "title": "Review RDP access"
+    }
+  ],
+  "schema_version": "2.0",
+  "scope": "Synthetic Windows demonstration; no real device was measured.",
+  "started_at": "2026-10-01T10:00:00+00:00",
+  "synthetic": true,
+  "vulnerabilities": []
+}

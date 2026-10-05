@@ -115,26 +115,47 @@ def refresh_enrichment(cves):
     return {"generated_at": utcnow(), "kev_catalog_version": kev.get("catalogVersion"), "cves": values}
 
 
-def query_osv(packages, budget=30):
-    """Explicit opt-in: package names, versions and ecosystems leave the endpoint."""
+def osv_identity(package):
+    """Preserve release/source context; do not fuzzy-match a distro binary to upstream."""
+    aliases = {"ubuntu": "Ubuntu", "debian": "Debian", "pypi": "PyPI", "alpine": "Alpine"}
+    ecosystem = aliases.get(package.get("ecosystem"), package.get("ecosystem"))
     supported = {"PyPI", "npm", "Go", "Maven", "crates.io", "NuGet", "Debian", "Ubuntu", "Alpine"}
+    if ecosystem not in supported or not package.get("name") or not package.get("version"):
+        return None
+    name, version = package["name"], package["version"]
+    if ecosystem in {"Debian", "Ubuntu", "Alpine"}:
+        release = package.get("distribution_release")
+        if not isinstance(release, str) or not release:
+            return None
+        ecosystem += ":" + release
+        name = package.get("source_name") or name
+        version = package.get("source_version") or version
+    return {"package": {"name": name, "ecosystem": ecosystem}, "version": version}
+
+
+def query_osv(packages, budget=30):
+    """Account for every package, including unsupported, capped and failed queries."""
+    if not isinstance(packages, list) or not 0 <= budget <= 600:
+        raise ValueError("Invalid inventory or OSV query budget")
     results, skipped = [], []
     deadline = time.monotonic() + budget
-    for package in packages[:500]:
-        if time.monotonic() >= deadline:
-            skipped.extend(p.get("name") for p in packages[packages.index(package) :])
-            break
-        if package.get("ecosystem") not in supported or not package.get("version"):
-            skipped.append(package.get("name"))
+    for index, package in enumerate(packages):
+        if not isinstance(package, dict):
+            raise ValueError("Invalid inventory package")
+        name = package.get("name", "unnamed")
+        identity = osv_identity(package)
+        if index >= 500 or time.monotonic() >= deadline or identity is None:
+            skipped.append(name)
             continue
-        response = request_json(
-            "https://api.osv.dev/v1/query",
-            {
-                "package": {"name": package["name"], "ecosystem": package["ecosystem"]},
-                "version": package["version"],
-            },
-            timeout=min(10, max(0.1, deadline - time.monotonic())),
-        )
+        try:
+            response = request_json(
+                "https://api.osv.dev/v1/query",
+                identity,
+                timeout=min(10, max(0.1, deadline - time.monotonic())),
+            )
+        except (OSError, ValueError):
+            skipped.append(name)
+            continue
         for vulnerability in response.get("vulns", []):
             if vulnerability.get("withdrawn"):
                 continue
@@ -142,13 +163,14 @@ def query_osv(packages, budget=30):
                 {
                     "id": vulnerability["id"],
                     "aliases": vulnerability.get("aliases", []),
-                    "name": package["name"],
-                    "ecosystem": package["ecosystem"],
+                    "name": name,
+                    "ecosystem": identity["package"]["ecosystem"],
                     "installed_version": package["version"],
+                    "queried_identity": identity,
                     "match": "OSV ecosystem-version query",
                     "references": [r["url"] for r in vulnerability.get("references", [])],
                     "summary": vulnerability.get("summary", ""),
-                    "confidence": "OSV match; verify platform applicability",
+                    "confidence": "OSV match; verify release, vendor backports and platform applicability",
                 }
             )
     return results, skipped

@@ -132,7 +132,13 @@ def test_successful_local_ai_cited_output(audit):
     response = Mock()
     response.__enter__ = Mock(return_value=response)
     response.__exit__ = Mock(return_value=False)
-    response.read.return_value = json.dumps({"response": f"Collect evidence for [{ident}]."}).encode()
+    from rsat.assistant import evidence_index
+
+    proposal = {
+        "audit_sha256": evidence_index(audit)["audit_sha256"],
+        "claims": [{"finding_id": ident, "status": "UNKNOWN", "type": "evidence_gap"}],
+    }
+    response.read.return_value = json.dumps({"response": json.dumps(proposal)}).encode()
     opener = Mock()
     opener.open.return_value = response
     with patch("rsat.exports.urllib.request.build_opener", return_value=opener):

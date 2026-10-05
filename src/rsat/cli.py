@@ -32,6 +32,11 @@ def parser():
     a.add_argument("--policy-key", type=Path, help="Pinned publisher public key")
     a.add_argument("--exceptions", type=Path)
     a.add_argument("--inventory", action="store_true")
+    a.add_argument(
+        "--ai-tools", action="store_true", help="Assess AI listeners and explicitly selected MCP configs"
+    )
+    a.add_argument("--mcp-config", type=Path, action="append", default=[])
+    a.add_argument("--progress", action="store_true", help="Collection stage timings on stderr")
     a.add_argument("--update-search", action="store_true", help="Opt into bounded live vendor update search")
     a.add_argument("--deadline", type=float, default=60)
     a.add_argument("--command-timeout", type=float, default=10)
@@ -120,6 +125,81 @@ def parser():
     o = sub.add_parser("oscal", help="Export an OSCAL assessment plan/results pair")
     o.add_argument("audit", type=Path)
     o.add_argument("--output", type=Path, required=True)
+    for name in ("ask", "adaptive", "graph", "simulate", "sbom", "ocsf", "mcp", "companion"):
+        c = sub.add_parser(name, help="Evidence workspace: " + name)
+        c.add_argument("audit", type=Path)
+        if name not in {"mcp", "companion"}:
+            c.add_argument("--output", type=Path)
+        if name == "ask":
+            c.add_argument("question")
+            c.add_argument("--finding", action="append", default=[])
+        if name == "simulate":
+            c.add_argument("controls", nargs="+")
+        if name == "companion":
+            c.add_argument("--token-file", type=Path, required=True)
+            c.add_argument("--origin", default="http://127.0.0.1:5173")
+            c.add_argument("--port", type=int, default=8766)
+            c.add_argument("--duration", type=float, default=300)
+    c = sub.add_parser("recheck", help="Explicitly run a fixed read-only capability")
+    c.add_argument("capability")
+    c.add_argument("--output", type=Path)
+    c = sub.add_parser("device-init", help="Generate persistent device signing identity")
+    c.add_argument("directory", type=Path)
+    c = sub.add_parser("snapshot", help="Append a signed audit to local device history")
+    c.add_argument("audit", type=Path)
+    c.add_argument("--keys", type=Path, required=True)
+    c.add_argument("--store", type=Path, required=True)
+    c.add_argument("--output", type=Path, required=True)
+    c = sub.add_parser("history", help="List or retain signed local history")
+    c.add_argument("store", type=Path)
+    c.add_argument("device_id")
+    c.add_argument("--keep-last", type=int)
+    c = sub.add_parser("watch", help="Bounded repeat audits and signed history; no background installation")
+    c.add_argument("--keys", type=Path, required=True)
+    c.add_argument("--store", type=Path, required=True)
+    c.add_argument("--output", type=Path, required=True)
+    c.add_argument("--count", type=int, default=2)
+    c.add_argument("--interval", type=float, default=60)
+    c.add_argument("--deadline", type=float, default=45)
+    c = sub.add_parser("org-token", help="Self-hosted administrator creates a scoped expiring token")
+    c.add_argument("store", type=Path)
+    c.add_argument("tenant")
+    c.add_argument("--scopes", nargs="+", required=True)
+    c.add_argument("--output", type=Path, required=True)
+    c = sub.add_parser("org-operation", help="Enrollment/upload/read/revoke with a scoped token")
+    c.add_argument("store", type=Path)
+    c.add_argument("action", choices=["challenge", "enroll", "upload", "history", "revoke"])
+    c.add_argument("data", type=Path)
+    c.add_argument("--token-file", type=Path, required=True)
+    c.add_argument("--output", type=Path)
+    c = sub.add_parser("enrollment-proof", help="Sign a short-lived tenant/device-bound challenge")
+    c.add_argument("challenge", type=Path)
+    c.add_argument("--key", type=Path, required=True)
+    c.add_argument("--output", type=Path, required=True)
+    for name in ("mlbom", "external", "policy-draft", "csaf"):
+        c = sub.add_parser(name, help="Validate and import/export " + name)
+        c.add_argument("source", type=Path)
+        c.add_argument("--output", type=Path)
+        if name == "csaf":
+            c.add_argument("--publisher-key", type=Path, required=True)
+    c = sub.add_parser("vex", help="Enrich without deleting findings using pinned signed OpenVEX")
+    c.add_argument("audit", type=Path)
+    c.add_argument("document", type=Path)
+    c.add_argument("--publisher-key", type=Path, required=True)
+    c.add_argument("--product", action="append", required=True)
+    c.add_argument("--output", type=Path)
+    c = sub.add_parser("update-fetch", help="Download a TUF-verified target without installing")
+    c.add_argument("target")
+    c.add_argument("--root", type=Path, required=True)
+    c.add_argument("--metadata-url", required=True)
+    c.add_argument("--target-url", required=True)
+    c.add_argument("--directory", type=Path, required=True)
+    c = sub.add_parser("connector", help="Read a configured HTTPS identity/cloud/MDM context contract")
+    c.add_argument("url")
+    c.add_argument("--kind", choices=["identity", "cloud", "mdm"], required=True)
+    c.add_argument("--subject", required=True)
+    c.add_argument("--token-file", type=Path, required=True)
+    c.add_argument("--output", type=Path, required=True)
     return p
 
 
@@ -182,11 +262,16 @@ def run_audit(args):
         if args.policy
         else "bundled original rules",
     }
+    if args.progress:
+        print("RSAT: Python runtime ready; starting bounded collection", file=sys.stderr, flush=True)
     runner = CommandRunner(args.command_timeout, args.deadline)
     audit["observations"] = Collector(
         runner,
         inventory=args.inventory or bool(args.intel_pack) or args.online_osv,
         update_search=args.update_search,
+        progress=(lambda ident, stage: print(f"RSAT: {ident}: {stage}", file=sys.stderr, flush=True))
+        if args.progress
+        else None,
     ).collect()
     if args.osquery:
         audit["observations"].extend(osquery_observations(args.osquery, runner))
@@ -227,9 +312,25 @@ def run_audit(args):
         audit["online_osv"] = {
             "queried_at": utcnow(),
             "skipped_packages": skipped,
+            "inventory_count": len(inventory),
+            "queried_count": len(inventory) - len(skipped),
             "data_shared": "package names, versions and ecosystems",
         }
+    if args.ai_tools or args.mcp_config:
+        from .ai_security import collect_ai_metadata, evaluate_ai
+
+        listeners = next(
+            (
+                o["value"]
+                for o in audit["observations"]
+                if o["id"] == "network.listeners" and o["state"] == "OK"
+            ),
+            [],
+        )
+        audit["observations"].extend(collect_ai_metadata(args.mcp_config, listeners))
     audit["findings"] = evaluate(policy, audit["observations"], audit["platform"])
+    if args.ai_tools or args.mcp_config:
+        audit["findings"].extend(evaluate_ai(audit["observations"]))
     if args.exceptions:
         apply_exceptions(audit["findings"], read_json(args.exceptions))
     audit["coverage"] = coverage(audit["findings"])
@@ -265,6 +366,36 @@ def run_audit(args):
             f"{audit['coverage']['FAIL']} failed; {audit['coverage']['UNKNOWN'] + audit['coverage']['ERROR']} unknown/errors"
         )
     return 2 if args.fail_on_findings and any(f["status"] == "FAIL" for f in audit["findings"]) else 0
+
+
+def watch(args):
+    import time
+    from .history import snapshot_from_file
+
+    if not 1 <= args.count <= 100 or not 1 <= args.interval <= 86400 or not 1 <= args.deadline <= 600:
+        raise ValueError("Invalid bounded watch budget")
+    for index in range(args.count):
+        options = parser().parse_args(
+            [
+                "audit",
+                "--output",
+                str(args.output),
+                "--deadline",
+                str(args.deadline),
+                "--command-timeout",
+                str(min(10, args.deadline)),
+                "--progress",
+            ]
+        )
+        before = set(args.output.glob("*/audit.json"))
+        run_audit(options)
+        created = set(args.output.glob("*/audit.json")) - before
+        if len(created) != 1:
+            raise ValueError("Unable to identify new watch audit")
+        source = created.pop()
+        emit(snapshot_from_file(source, args.keys, args.store), source.parent / "snapshot.json")
+        if index + 1 < args.count:
+            time.sleep(args.interval)
 
 
 def serve(path, port, duration):
@@ -304,7 +435,105 @@ def serve(path, port, duration):
 def main(argv=None):
     args = parser().parse_args(argv if argv is not None else (sys.argv[1:] or ["audit"]))
     try:
-        if args.command == "audit":
+        if args.command in {"ask", "adaptive", "graph", "simulate", "sbom", "ocsf", "mcp", "companion"}:
+            from .assistant import answer, adaptive_plan
+            from .graph import build_graph, simulate_change
+            from .interoperability import sbom, ocsf
+            from .interfaces import mcp_stdio, serve_api, read_capability
+
+            audit = load_audit(args.audit)
+            if args.command == "mcp":
+                mcp_stdio(audit)
+            elif args.command == "companion":
+                serve_api(
+                    lambda name, data: read_capability(audit, name, data),
+                    args.token_file.read_text().strip(),
+                    args.port,
+                    args.duration,
+                    args.origin,
+                )
+            else:
+                result = {
+                    "ask": lambda: answer(audit, args.question, args.finding),
+                    "adaptive": lambda: adaptive_plan(audit),
+                    "graph": lambda: build_graph(audit),
+                    "simulate": lambda: simulate_change(audit, args.controls),
+                    "sbom": lambda: sbom(audit),
+                    "ocsf": lambda: ocsf(audit),
+                }[args.command]()
+                emit(result, args.output)
+        elif args.command == "recheck":
+            from .recheck import recheck
+
+            emit(recheck(args.capability), args.output)
+        elif args.command == "device-init":
+            from .history import device_init
+
+            emit(device_init(args.directory))
+        elif args.command == "snapshot":
+            from .history import snapshot_from_file
+
+            emit(snapshot_from_file(args.audit, args.keys, args.store), args.output)
+        elif args.command == "history":
+            from .history import history_status, prune_history
+
+            emit(
+                prune_history(args.store, args.device_id, args.keep_last)
+                if args.keep_last
+                else history_status(args.store, args.device_id)
+            )
+        elif args.command == "watch":
+            watch(args)
+        elif args.command == "org-token":
+            from .organization import issue_token
+
+            emit(issue_token(args.store, args.tenant, args.scopes), args.output)
+        elif args.command == "org-operation":
+            from .organization import operation
+
+            emit(
+                operation(args.store, read_json(args.token_file)["token"], args.action, read_json(args.data)),
+                args.output,
+            )
+        elif args.command == "enrollment-proof":
+            from .organization import enrollment_proof
+
+            emit(enrollment_proof(read_json(args.challenge), args.key), args.output)
+        elif args.command in {"mlbom", "external", "policy-draft", "csaf"}:
+            from .interoperability import mlbom, external_evidence, csaf, verify_document
+            from .drafts import validate_draft
+
+            result = (
+                csaf(verify_document(read_json(args.source), args.publisher_key))
+                if args.command == "csaf"
+                else {"mlbom": mlbom, "external": external_evidence, "policy-draft": validate_draft}[
+                    args.command
+                ](read_json(args.source))
+            )
+            emit(result, args.output)
+        elif args.command == "vex":
+            from .interoperability import verify_document, trusted_vex
+
+            emit(
+                trusted_vex(
+                    load_audit(args.audit)["vulnerabilities"],
+                    verify_document(read_json(args.document), args.publisher_key),
+                    args.product,
+                ),
+                args.output,
+            )
+        elif args.command == "update-fetch":
+            from .updates import fetch_update
+
+            emit(fetch_update(args.root, args.metadata_url, args.target_url, args.target, args.directory))
+        elif args.command == "connector":
+            from .connectors import fetch_context
+
+            emit(
+                fetch_context(args.url, args.token_file.read_text().strip(), args.kind, args.subject),
+                args.output,
+            )
+        elif args.command == "audit":
             return run_audit(args)
         if args.command == "report":
             write_new(args.output, render(load_audit(args.audit)))

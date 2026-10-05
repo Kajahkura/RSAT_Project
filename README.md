@@ -9,13 +9,13 @@
   <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-334155" alt="Windows, macOS, Linux">
 </p>
 
-<p align="center"><strong>Portable endpoint auditing for consultants and small IT teams.</strong><br>Inspect the evidence. Prioritize the work. Verify the improvement.</p>
+<p align="center"><strong>Endpoint and AI tooling security, grounded in evidence.</strong><br>Inspect the evidence. Prioritize the work. Verify the improvement.</p>
 
 <p align="center">
   <a href="#quick-start">Quick start</a> · <a href="docs/usage.md">Usage guide</a> · <a href="docs/architecture.md">Architecture</a> · <a href="docs/validation.md">Validation</a> · <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
-RSAT is an open-source Remote Security Audit Tool that runs a bounded, read-only endpoint assessment and produces a self-contained HTML report, structured JSON, and a remediation plan. It works locally without a persistent agent or a required cloud service. Optional workflows add existing SSH/HTTPS WinRM collection, signed evidence, recipient encryption, vulnerability intelligence, and comparisons across audits.
+RSAT is an open-source Remote Security Audit Tool that runs a bounded, read-only endpoint assessment and produces a self-contained HTML report, structured JSON, and a remediation plan. It works locally without a persistent agent or a required cloud service. The optional [browser workspace](web/) adds local imports, independently pinned bundle verification, evidence inspection and encrypted local history. Optional workflows add existing SSH/HTTPS WinRM collection, signed evidence, recipient encryption, vulnerability intelligence, and comparisons across audits.
 
 ## An audit you can inspect
 
@@ -35,6 +35,19 @@ Every conclusion links to collected evidence and a versioned rule. PASS, FAIL, U
 | **Progress tracking** | Resolved findings, regressions, policy changes, and expiring exceptions |
 | **Explicit remediation** | Manual plans plus a small allowlist with dry-run, backup, execution, verification, and rollback |
 | **Optional integrations** | osquery, existing SSH access, second-host TCP probes, offline advisories, OSV/KEV/EPSS, OSCAL, and local AI summaries |
+
+## New in 2.1
+
+| Capability | Concrete behavior |
+|---|---|
+| **AI tooling assessments** | Five original rules for model listeners and explicitly selected MCP configuration declarations; secrets are excluded |
+| **Grounded assistance** | Offline evidence retrieval, exact audit-bound model claims, fixed read-only rechecks and an MCP stdio interface |
+| **Evidence relationships** | Provenance-bearing graph exports and clearly conditional change simulations |
+| **Signed device history** | Hash-linked snapshots, replay-resistant enrollment, scoped self-hosted tokens, retention and bounded foreground watch |
+| **Portable intelligence** | CycloneDX SBOM/ML-BOM, OCSF compliance events, pinned publisher VEX/CSAF, explicit external-context contracts |
+| **Reviewed updates and policies** | Maintained TUF download verification and constrained policy drafts with outcome fixtures |
+
+See the [platform guide](docs/platform.md) for commands, trust boundaries and integration prerequisites. Hardware attestation, automatic fleet installation, provider-specific cloud mappings and end-to-end encrypted cloud sync are not implemented.
 
 ## Quick start
 
@@ -103,10 +116,11 @@ flowchart LR
     F --> M[Remediation + re-audit]
 ```
 
-The core uses Python for audit orchestration and policies, PowerShell/CIM for Windows queries, native macOS/Linux interfaces, and HTML/CSS/JavaScript for standalone reports. Cryptography uses maintained standard primitives. The [architecture guide](docs/architecture.md) explains the module boundaries and trust model.
+The core uses Python for audit orchestration and policies, PowerShell/CIM for Windows queries, native macOS/Linux interfaces, HTML/CSS/JavaScript for standalone reports, and React/TypeScript for the browser workspace. Cryptography uses maintained standard primitives. The [architecture guide](docs/architecture.md) explains the module boundaries and trust model.
 
 ```text
-src/rsat/       collectors, policies, analysis, reports, evidence, CLI
+src/rsat/       collectors, policy, analysis, trust, interfaces, CLI
+web/            React/TypeScript browser-local evidence workspace
 tests/          regressions, integration boundaries, security cases
 scripts/        native smoke tests, packaging, release inventory
 docs/           architecture, usage, validation, design rationale

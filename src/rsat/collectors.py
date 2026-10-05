@@ -23,12 +23,13 @@ def privileged():
 
 
 class Collector:
-    def __init__(self, runner=None, os_type=None, inventory=False, update_search=False):
+    def __init__(self, runner=None, os_type=None, inventory=False, update_search=False, progress=None):
         self.runner = runner or CommandRunner()
         self.os_type = os_type or platform.system()
         self.inventory = inventory
         self.update_search = update_search
         self.observations = []
+        self.progress = progress
 
     def add(self, ident, value=None, state="OK", source="native", reason="", duration_ms=0):
         self.observations.append(
@@ -36,7 +37,11 @@ class Collector:
         )
 
     def query(self, ident, argv=None, script=None, parser=None):
+        if self.progress:
+            self.progress(ident, "starting")
         result = self.runner.powershell(script) if script else self.runner.run(argv)
+        if self.progress:
+            self.progress(ident, f"{result.state} ({result.duration_ms}ms)")
         source = "PowerShell/CIM" if script else argv[0]
         if result.state != "OK":
             self.add(
@@ -80,6 +85,9 @@ class Collector:
 
     def collect(self):
         self.add("runtime.privileged", privileged(), source="process token")
+        from .context import environment_context
+
+        self.add("runtime.environment", environment_context(system=self.os_type), source="runtime context")
         methods = {"Windows": self.windows, "Darwin": self.macos, "Linux": self.linux}
         if self.os_type not in methods:
             raise ValueError(f"Unsupported platform: {self.os_type}")
@@ -325,19 +333,16 @@ class Collector:
             reason="Backup availability and recovery require external evidence",
         )
         if self.inventory:
-            result = self.runner.run(["dpkg-query", "-W", "-f=${binary:Package}\t${Version}\n"])
+            result = self.runner.run(
+                [
+                    "dpkg-query",
+                    "-W",
+                    "-f=${binary:Package}\t${Version}\t${source:Package}\t${source:Version}\t${Architecture}\n",
+                ]
+            )
             if result.state == "OK":
-                ecosystem = self.observation_value("os.info", {}).get("id", "Linux")
-                self.add(
-                    "software.inventory",
-                    [
-                        {"name": name.split(":")[0], "version": ver, "ecosystem": ecosystem}
-                        for name, ver in (
-                            line.split("\t", 1) for line in result.stdout.splitlines() if "\t" in line
-                        )
-                    ],
-                    source="dpkg-query",
-                )
+                info = self.observation_value("os.info", {})
+                self.add("software.inventory", parse_dpkg_inventory(result.stdout, info), source="dpkg-query")
             else:
                 self.query(
                     "software.inventory",
@@ -545,3 +550,40 @@ def osquery_observations(executable, runner):
                 asdict(Observation(ident, state="UNKNOWN", source="osqueryi", reason=str(exc)))
             )
     return observations
+
+
+def parse_dpkg_inventory(text, info):
+    from urllib.parse import quote
+
+    distribution = info.get("id", "Linux")
+    release = info.get("version_id", "")
+    ecosystem = {"ubuntu": "Ubuntu", "debian": "Debian"}.get(distribution, distribution)
+    packages = []
+    for line in text.splitlines():
+        columns = line.split("\t")
+        if len(columns) < 2:
+            continue
+        binary, version = columns[:2]
+        name = binary.split(":")[0]
+        source = columns[2] if len(columns) > 2 and columns[2] else name
+        source_version = columns[3] if len(columns) > 3 and columns[3] else version
+        architecture = columns[4] if len(columns) > 4 else ""
+        packages.append(
+            {
+                "name": name,
+                "version": version,
+                "ecosystem": ecosystem,
+                "distribution": distribution,
+                "distribution_release": release,
+                "source_name": source,
+                "source_version": source_version,
+                "architecture": architecture,
+                "purl": f"pkg:deb/{quote(distribution, safe='')}/{quote(name, safe='')}@{quote(version, safe='')}"
+                + (
+                    f"?arch={quote(architecture, safe='')}&distro={quote(distribution + '-' + release, safe='')}"
+                    if architecture
+                    else ""
+                ),
+            }
+        )
+    return packages
