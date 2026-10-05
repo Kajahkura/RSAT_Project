@@ -5,6 +5,7 @@ import json
 from urllib.parse import urlsplit
 from urllib.request import Request, build_opener
 from urllib.request import HTTPRedirectHandler
+from .interoperability import external_evidence
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -12,7 +13,6 @@ class NoRedirect(HTTPRedirectHandler):
         raise ValueError("Connector redirects are not allowed")
 
 
-from .interoperability import external_evidence
 
 
 def fetch_context(url, token, kind, subject_id, timeout=15):
