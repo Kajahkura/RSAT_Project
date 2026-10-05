@@ -68,11 +68,12 @@ jobs:
       - run: python -m pip install -r requirements-visual.txt -e ".[crypto]"
       - run: python -m playwright install --with-deps chromium
       - run: python scripts/ci_browser.py
+      - run: python scripts/web_package.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: RSAT-web-verified
           path: |
-            web/dist/
+            web/RSAT-web-workspace.zip
             docs/assets/workspace-*.png
 
   build:

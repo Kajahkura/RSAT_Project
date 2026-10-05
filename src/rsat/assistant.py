@@ -83,8 +83,15 @@ def answer(audit, question, finding_ids=None):
     if identifiers:
         selected = [f for f in candidates if f["finding_id"] in identifiers]
     else:
+        matching = [
+            f
+            for f in candidates
+            if any(
+                word in (f["title"] + " " + f["finding_id"] + " " + f["details"]).lower() for word in terms
+            )
+        ]
         selected = sorted(
-            candidates,
+            matching,
             key=lambda f: (
                 -sum(word in (f["title"] + " " + f["finding_id"]).lower() for word in terms),
                 {"FAIL": 0, "ERROR": 1, "UNKNOWN": 2, "PASS": 3}[f["status"]],

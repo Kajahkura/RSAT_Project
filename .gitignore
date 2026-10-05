@@ -32,3 +32,5 @@ web/node_modules
 .coverage.*
 pytest-results.xml
 !web/index.html
+
+web/RSAT-web-workspace.zip

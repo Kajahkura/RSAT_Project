@@ -59,7 +59,7 @@ rsat enrollment-proof challenge.json --key device-keys/signing.key.pem --output 
 rsat org-operation org.db enroll proof.json --token-file team-token.json
 ```
 
-`key-request.json` contains `public_key`. Upload input contains `device_id` and `snapshot`. Read/revoke input contains `device_id`. Use distinct narrowly scoped tokens for operational clients. Signed plaintext evidence is readable by the self-hosted store owner. This is not end-to-end encrypted cloud synchronization, a production identity service or a managed fleet installer. Deploy behind your own authenticated TLS gateway and encrypted storage if exposing an organization service.
+`key-request.json` contains `public_key`. Upload input contains `device_id` and `snapshot`. Read/revoke input contains `device_id`. Use distinct narrowly scoped tokens for operational clients. Signed plaintext evidence is readable by the self-hosted store owner. This is not end-to-end encrypted cloud synchronization, a production identity service or a managed fleet installer. `rsat org-serve org.db --token-file team-token.json` exposes those capabilities on an exact-origin authenticated loopback API. Deploy behind your own authenticated TLS gateway and encrypted storage if exposing an organization service.
 
 ## Interoperability and trust
 

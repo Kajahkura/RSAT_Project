@@ -8,3 +8,8 @@ updates:
     directory: /
     schedule:
       interval: monthly
+
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly

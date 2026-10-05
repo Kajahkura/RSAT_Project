@@ -5,7 +5,7 @@ import pytest
 from rsat.updates import fetch_update
 
 
-def test_tuf_rejects_unsigned_tampered_and_rollback_targets(tmp_path):
+def test_tuf_rejects_tampered_and_expired_targets(tmp_path):
     pytest.importorskip("tuf")
     from tuf.api.metadata import Metadata, Root, Targets, Snapshot, Timestamp, MetaFile, TargetFile
     from securesystemslib.signer import CryptoSigner
@@ -66,6 +66,33 @@ def test_tuf_rejects_unsigned_tampered_and_rollback_targets(tmp_path):
             tmp_path / "cache",
         )
         assert Path(result["verified_target"]).read_bytes() == target and not result["installed"]
+        from tuf.api.exceptions import BadVersionNumberError
+
+        newer = Metadata(
+            Timestamp(
+                version=2,
+                expires=expires,
+                snapshot_meta=MetaFile.from_data(1, snapshot.to_bytes(), ["sha256"]),
+            )
+        )
+        newer.sign(signers["timestamp"])
+        files["timestamp.json"] = newer.to_bytes()
+        fetch_update(
+            pinned,
+            "https://example.org/meta/",
+            "https://example.org/targets/",
+            "collector",
+            tmp_path / "cache",
+        )
+        files["timestamp.json"] = timestamp.to_bytes()
+        with pytest.raises(BadVersionNumberError):
+            fetch_update(
+                pinned,
+                "https://example.org/meta/",
+                "https://example.org/targets/",
+                "collector",
+                tmp_path / "cache",
+            )
         files["collector"] = b"tampered"
         with pytest.raises(Exception):
             fetch_update(

@@ -125,6 +125,10 @@ def operation(path, token, action, data):
                 base64.b64decode(data["signature"], validate=True),
                 canonical(challenge),
             )
+            if db.execute(
+                "SELECT 1 FROM devices WHERE tenant=? AND device=?", (tenant, expected["device_id"])
+            ).fetchone():
+                raise ValueError("Device already enrolled; revoked identities require a new key")
             db.execute(
                 "INSERT INTO devices(tenant,device,public) VALUES (?,?,?)",
                 (tenant, expected["device_id"], row[0]),

@@ -134,6 +134,12 @@ def trusted_vex(vulnerabilities, document, product_ids, max_age_days=30):
         result = dict(vulnerability)
         decisions = []
         for statement in document["statements"]:
+            if (
+                not isinstance(statement, dict)
+                or not isinstance(statement.get("vulnerability"), dict)
+                or not isinstance(statement.get("products"), list)
+            ):
+                raise ValueError("Invalid VEX statement")
             name = statement.get("vulnerability", {}).get("name")
             ids = [vulnerability["id"], *vulnerability.get("aliases", [])]
             products = {p.get("@id") for p in statement.get("products", []) if isinstance(p, dict)}
@@ -169,6 +175,12 @@ def external_evidence(data):
         or data.get("kind") not in {"identity", "cloud", "mdm", "attestation"}
     ):
         raise ValueError("Invalid external evidence contract")
+    for field in ("subject_id", "source", "collected_at"):
+        if not isinstance(data.get(field), str) or not data[field]:
+            raise ValueError("Invalid external source/subject/timestamp")
+    when = datetime.fromisoformat(data["collected_at"].replace("Z", "+00:00"))
+    if when.tzinfo is None:
+        raise ValueError("External timestamp needs timezone")
     required = ["subject_id", "source", "collected_at", "claims"]
     if any(key not in data for key in required) or not isinstance(data["claims"], list):
         raise ValueError("Missing external evidence metadata")

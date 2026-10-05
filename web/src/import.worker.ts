@@ -1,6 +1,5 @@
 import { unzipSync } from 'fflate';
 import { validateAudit,record } from './evidence';
-const encoder=new TextEncoder();
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),x=>x.toString(16).padStart(2,'0')).join('');
 async function digest(data:Uint8Array){return hex(await crypto.subtle.digest('SHA-256',data as BufferSource));}
 function pem(pinned:string){if(!pinned.includes('-----BEGIN PUBLIC KEY-----')||pinned.length>2000)throw Error('Choose an Ed25519 public PEM key.');const raw=atob(pinned.replace(/-----[A-Z ]+-----/g,'').replace(/\s/g,''));return Uint8Array.from(raw,c=>c.charCodeAt(0));}

@@ -172,6 +172,12 @@ def parser():
     c.add_argument("data", type=Path)
     c.add_argument("--token-file", type=Path, required=True)
     c.add_argument("--output", type=Path)
+    c = sub.add_parser("org-serve", help="Serve a tenant-scoped loopback organization API")
+    c.add_argument("store", type=Path)
+    c.add_argument("--token-file", type=Path, required=True)
+    c.add_argument("--origin", default="http://127.0.0.1:5173")
+    c.add_argument("--port", type=int, default=8767)
+    c.add_argument("--duration", type=float, default=300)
     c = sub.add_parser("enrollment-proof", help="Sign a short-lived tenant/device-bound challenge")
     c.add_argument("challenge", type=Path)
     c.add_argument("--key", type=Path, required=True)
@@ -494,6 +500,18 @@ def main(argv=None):
             emit(
                 operation(args.store, read_json(args.token_file)["token"], args.action, read_json(args.data)),
                 args.output,
+            )
+        elif args.command == "org-serve":
+            from .interfaces import serve_api
+            from .organization import operation
+
+            token = read_json(args.token_file)["token"]
+            serve_api(
+                lambda name, data: operation(args.store, token, name, data),
+                token,
+                args.port,
+                args.duration,
+                args.origin,
             )
         elif args.command == "enrollment-proof":
             from .organization import enrollment_proof

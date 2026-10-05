@@ -145,3 +145,24 @@ def test_adaptive_plan_only_registered_actions(audit):
     audit["findings"][0]["status"] = "UNKNOWN"
     result = adaptive_plan(audit)
     assert not result["execution_authorized"] and all(x["read_only"] for x in result["suggestions"])
+
+
+def test_known_ai_failure_not_hidden_by_partial_config(tmp_path):
+    good = tmp_path / "bad-settings.json"
+    good.write_text(
+        json.dumps(
+            {
+                "mcpServers": {
+                    "test": {"url": "http://example.org", "permissions": {"filesystem": ["/"], "write": True}}
+                }
+            }
+        )
+    )
+    observations = collect_ai_metadata([good, tmp_path / "missing.json"], [])
+    findings = {f["id"]: f for f in evaluate_ai(observations)}
+    assert findings["RSAT-AI-002"]["status"] == "FAIL"
+    assert findings["RSAT-AI-003"]["status"] == "FAIL"
+
+
+def test_assistant_abstains_without_matching_evidence(audit):
+    assert answer(audit, "quantum banana economics")["abstained"]

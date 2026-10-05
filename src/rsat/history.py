@@ -1,6 +1,7 @@
 """Tamper-evident local history with device-key identity and explicit retention."""
 
 import hashlib
+import re
 from pathlib import Path
 import sqlite3
 from contextlib import contextmanager
@@ -54,11 +55,15 @@ def verify_snapshot(snapshot, pinned_public_key):
     if not isinstance(snapshot, dict) or set(snapshot) != {"payload", "signature", "public_key"}:
         raise ValueError("Invalid signed snapshot")
     public = pinned_public_key.encode() if isinstance(pinned_public_key, str) else pinned_public_key
-    if snapshot["public_key"].encode() != public:
+    if not isinstance(snapshot["public_key"], str) or snapshot["public_key"].encode() != public:
         raise ValueError("Snapshot signer does not match pinned device key")
     payload = snapshot["payload"]
     if not isinstance(payload, dict) or payload.get("schema_version") != "1.0":
         raise ValueError("Unsupported snapshot")
+    if not isinstance(payload.get("previous_hash"), str) or (
+        payload["previous_hash"] and not re.fullmatch("[a-f0-9]{64}", payload["previous_hash"])
+    ):
+        raise ValueError("Invalid previous snapshot hash")
     validate_audit(payload.get("audit"))
     if payload.get("device_id") != hashlib.sha256(public).hexdigest():
         raise ValueError("Invalid device identity")
