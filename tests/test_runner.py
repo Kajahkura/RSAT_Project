@@ -31,7 +31,7 @@ def test_command_failures_preserved():
 
 
 def test_output_is_bounded():
-    result = CommandRunner(output_limit=100).run([sys.executable, "-c", "print('x'*10000)"])
+    result = CommandRunner(timeout=30, deadline=40, output_limit=100).run([sys.executable, "-c", "print('x'*10000)"])
     assert result.state == "UNKNOWN" and "limit" in result.reason
 
 
