@@ -19,8 +19,12 @@ def test_companion_requires_exact_host_origin_bearer_and_contract():
         called.append((name, data))
         return {"read_only": True}
 
-    thread = threading.Thread(target=serve_api, args=(callback, token, port, 3, origin))
+    stop, ready = threading.Event(), threading.Event()
+    thread = threading.Thread(
+        target=serve_api, args=(callback, token, port, 30, origin, stop, ready), daemon=True
+    )
     thread.start()
+    assert ready.wait(15), "Companion failed to bind loopback"
     deadline = time.monotonic() + 2
     while time.monotonic() < deadline:
         try:
@@ -51,5 +55,6 @@ def test_companion_requires_exact_host_origin_bearer_and_contract():
     assert post(base, '{"command":"evil"}') == 400
     assert post({**base, "Content-Type": "text/plain"}) == 400
     assert len(called) == 1
+    stop.set()
     thread.join(5)
     assert not thread.is_alive()

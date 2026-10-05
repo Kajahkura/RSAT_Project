@@ -119,7 +119,15 @@ def mcp_stdio(audit, input_stream=None, output_stream=None):
         destination.flush()
 
 
-def serve_api(callback, token, port=8766, duration=300, origin="http://127.0.0.1:5173"):
+def serve_api(
+    callback,
+    token,
+    port=8766,
+    duration=300,
+    origin="http://127.0.0.1:5173",
+    stop_event=None,
+    ready_event=None,
+):
     if not isinstance(token, str) or len(token) < 32 or not 1 <= port <= 65535 or not 0 < duration <= 3600:
         raise ValueError("Require a strong token and bounded port/duration")
     from urllib.parse import urlsplit
@@ -189,9 +197,20 @@ def serve_api(callback, token, port=8766, duration=300, origin="http://127.0.0.1
             self.connection.settimeout(5)
             super().handle()
 
-    with HTTPServer(("127.0.0.1", port), Handler) as server:
+    class LoopbackServer(HTTPServer):
+        def server_bind(self):
+            # A literal loopback endpoint does not need reverse DNS during startup.
+            from socketserver import TCPServer
+
+            TCPServer.server_bind(self)
+            self.server_name = "127.0.0.1"
+            self.server_port = self.server_address[1]
+
+    with LoopbackServer(("127.0.0.1", port), Handler) as server:
         server.timeout = 0.5
         print(f"RSAT typed API: http://{expected_host}/capability", file=sys.stderr, flush=True)
+        if ready_event is not None:
+            ready_event.set()
         until = time.monotonic() + duration
-        while time.monotonic() < until:
+        while time.monotonic() < until and not (stop_event and stop_event.is_set()):
             server.handle_request()

@@ -166,10 +166,10 @@ def evaluate_ai(observations):
     ]
     for suffix, title, failed, severity, remediation in checks:
         state = (
-            "UNKNOWN"
-            if not entries or any(o["state"] != "OK" for o in configs)
-            else "FAIL"
+            "FAIL"
             if any(failed(x) for x in entries)
+            else "UNKNOWN"
+            if not entries or any(o["state"] != "OK" for o in configs)
             else "UNKNOWN"
             if suffix == "003" and any(not x["permissions_declared"] for x in entries)
             else "PASS"
