@@ -13,12 +13,14 @@ def draft():
     policy = load_policy()
     rule = next(r for r in policy["rules"] if r["id"] == "RSAT-FW-001")
     policy = {**policy, "rules": [rule]}
-    from rsat.policy import evaluate
-
     fixtures = []
-    for state, value in [("OK", [{"enabled": True}]), ("OK", [{"enabled": False}]), ("UNKNOWN", None)]:
+    for state, value, outcome in [
+        ("OK", [{"enabled": True}], "PASS"),
+        ("OK", [{"enabled": False}], "FAIL"),
+        ("UNKNOWN", None, "UNKNOWN"),
+    ]:
         observations = [{"id": rule["observation"], "state": state, "value": value}]
-        expected = {f["id"]: f["status"] for f in evaluate(policy, observations, "Windows")}
+        expected = {"RSAT-FW-001": outcome}
         fixtures.append({"platform": "Windows", "observations": observations, "expected": expected})
     return {
         "policy": policy,

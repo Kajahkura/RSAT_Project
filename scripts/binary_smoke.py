@@ -49,6 +49,21 @@ def main():
             "keys/recipient.key.pem",
         )
         assert (root / "restored.zip").read_bytes() == signed.read_bytes()
+        run("device-init", "device-keys")
+        run(
+            "snapshot",
+            output / "audit.json",
+            "--keys",
+            "device-keys",
+            "--store",
+            "history.db",
+            "--output",
+            "snapshot.json",
+        )
+        snapshot = json.loads((root / "snapshot.json").read_bytes())
+        assert snapshot["payload"]["sequence"] == 1
+        run("graph", output / "audit.json", "--output", "graph.json")
+        run("sbom", output / "audit.json", "--output", "inventory.cdx.json")
         run("keygen", "wrong-keys")
         wrong = subprocess.run(
             [binary, "verify", str(signed), "--trusted-key", "wrong-keys/signing.pub.pem"],

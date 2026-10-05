@@ -102,7 +102,11 @@ class CommandRunner:
                             os.killpg(process.pid, signal.SIGKILL)
                         except ProcessLookupError:
                             pass
-                    process.kill()
+                    try:
+                        process.kill()
+                    except ProcessLookupError:
+                        # A capped/expired process may exit between poll and cleanup.
+                        pass
                 process.wait(timeout=3)
                 out.seek(0)
                 err.seek(0)
