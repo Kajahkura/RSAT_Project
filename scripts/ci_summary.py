@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 path = Path(sys.argv[1])
 if path.exists():
-    for testcase in ET.parse(path).iter("testcase"):
+    for testcase in ET.parse(path).iter("testcase"):  # noqa: S314 -- trusted pytest-generated CI artifact
         for failure in list(testcase.findall("failure")) + list(testcase.findall("error")):
             text = (
                 testcase.attrib.get("name", "test")
