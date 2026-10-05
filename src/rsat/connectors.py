@@ -13,8 +13,6 @@ class NoRedirect(HTTPRedirectHandler):
         raise ValueError("Connector redirects are not allowed")
 
 
-
-
 def fetch_context(url, token, kind, subject_id, timeout=15):
     parsed = urlsplit(url)
     if (
