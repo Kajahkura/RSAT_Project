@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/Kajahkura/RSAT_Project/actions/workflows/build.yml"><img src="https://github.com/Kajahkura/RSAT_Project/actions/workflows/build.yml/badge.svg" alt="Test and build"></a>
+  <img src="https://img.shields.io/badge/TypeScript-React%20workspace-3178c6" alt="TypeScript workspace">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2563eb" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/Python-3.11%2B-3776ab" alt="Python 3.11+">
   <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-334155" alt="Windows, macOS, Linux">
