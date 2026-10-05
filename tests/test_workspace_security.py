@@ -176,7 +176,8 @@ def test_workspace_cli_is_accessible(tmp_path, audit, capsys, command):
     if command == "simulate":
         args.append(audit["findings"][0]["id"])
     assert main(args) == 0
-    assert json.loads(capsys.readouterr().out)
+    result = json.loads(capsys.readouterr().out)
+    assert isinstance(result, (dict, list))
 
 
 def test_progress_leaves_stdout_machine_readable(audit, capsys):

@@ -4,7 +4,14 @@ from datetime import datetime, timezone
 import json
 from urllib.parse import urlsplit
 from urllib.request import Request, build_opener
-from .intelligence import NoRedirect
+from urllib.request import HTTPRedirectHandler
+
+
+class NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, *_args, **_kwargs):
+        raise ValueError("Connector redirects are not allowed")
+
+
 from .interoperability import external_evidence
 
 

@@ -8,7 +8,7 @@ self.onmessage=async(event:MessageEvent<{bytes:ArrayBuffer;zip:boolean;pinned:st
  try{
   const {bytes,zip,pinned}=event.data;
   if(bytes.byteLength>20000000)throw Error('File exceeds the 20 MB import limit.');
-  let raw=new Uint8Array(bytes);let trust='Unverified JSON import';
+  let raw:Uint8Array=new Uint8Array(bytes);let trust='Unverified JSON import';
   if(zip){
    let total=0,count=0;const names=new Set<string>();
    const entries=unzipSync(raw,{filter:file=>{total+=file.originalSize;count++;if(count>100||total>50000000||!Number.isSafeInteger(file.originalSize)||file.originalSize<0||names.has(file.name)||/[\\/]/.test(file.name)||file.name.startsWith('.'))throw Error('Unsafe evidence bundle.');names.add(file.name);return true;}});

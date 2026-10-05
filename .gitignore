@@ -28,3 +28,7 @@ web/dist/
 *.db-journal
 
 web/node_modules
+
+.coverage.*
+pytest-results.xml
+!web/index.html
