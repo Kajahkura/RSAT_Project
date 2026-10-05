@@ -65,6 +65,9 @@ def test_capped_process_exit_during_cleanup_preserves_outcome():
     process.kill.side_effect = ProcessLookupError()
     with (
         patch("rsat.runner.subprocess.Popen", return_value=process),
+        patch.object(
+            CommandRunner, "resolve", side_effect=lambda name: None if name == "taskkill" else sys.executable
+        ),
         patch("rsat.runner.os.fstat", return_value=Mock(st_size=1000)),
         patch("rsat.runner.os.killpg", side_effect=ProcessLookupError(), create=True),
     ):
