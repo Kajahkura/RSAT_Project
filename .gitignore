@@ -26,3 +26,5 @@ web/dist/
 .blinkhost/
 *.db
 *.db-journal
+
+web/node_modules
