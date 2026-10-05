@@ -55,3 +55,18 @@ def test_json_decoder():
     assert rows(None) == []
     with pytest.raises(ValueError):
         parse_json(CommandResult(stdout="not-json"))
+
+
+def test_capped_process_exit_during_cleanup_preserves_outcome():
+    from unittest.mock import Mock, patch
+
+    process = Mock(returncode=0)
+    process.poll.return_value = None
+    process.kill.side_effect = ProcessLookupError()
+    with (
+        patch("rsat.runner.subprocess.Popen", return_value=process),
+        patch("rsat.runner.os.fstat", return_value=Mock(st_size=1000)),
+        patch("rsat.runner.os.killpg", side_effect=ProcessLookupError(), create=True),
+    ):
+        result = CommandRunner(output_limit=100).run([sys.executable, "-c", "print('synthetic')"])
+    assert result.state == "UNKNOWN" and "output exceeded limit" in result.reason

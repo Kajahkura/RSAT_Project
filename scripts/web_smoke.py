@@ -51,6 +51,11 @@ try:
         page.get_by_role("button", name="Explore a synthetic demo").click()
         page.locator(".metric-grid").wait_for(timeout=30000)
         assert "Synthetic Windows" in page.locator(".scope-note").inner_text()
+        page.screenshot(path=str(root / "docs/assets/workspace-desktop.png"), full_page=True)
+        page.set_viewport_size({"width": 390, "height": 844})
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+        page.screenshot(path=str(root / "docs/assets/workspace-mobile.png"), full_page=True)
+        page.set_viewport_size({"width": 1440, "height": 1000})
         page.get_by_role("button", name="Findings", exact=False).first.click()
         page.get_by_label("Filter outcome").select_option("FAIL")
         assert page.locator("tbody tr").count() > 0
@@ -102,10 +107,8 @@ try:
         page.get_by_role("status").filter(has_text="All local encrypted snapshots deleted").wait_for()
         assert page.locator(".history-row").count() == 0
         page.get_by_role("button", name="Overview", exact=True).click()
-        page.screenshot(path=str(root / "docs/assets/workspace-desktop.png"), full_page=True)
         page.set_viewport_size({"width": 390, "height": 844})
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
-        page.screenshot(path=str(root / "docs/assets/workspace-mobile.png"), full_page=True)
         assert not errors, errors
         assert not evidence_requests, evidence_requests
         browser.close()
