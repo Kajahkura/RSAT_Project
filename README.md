@@ -50,6 +50,19 @@ Every conclusion links to collected evidence and a versioned rule. PASS, FAIL, U
 
 See the [platform guide](docs/platform.md) for commands, trust boundaries and integration prerequisites. Hardware attestation, automatic fleet installation, provider-specific cloud mappings and end-to-end encrypted cloud sync are not implemented.
 
+### Browser workspace
+
+Start with operating-system-specific onboarding, open evidence locally, inspect findings and relationships, and keep encrypted history in your browser. Download the static workspace from the [2.1.0 release](https://github.com/Kajahkura/RSAT_Project/releases/tag/v2.1.0) or follow the [self-hosting guide](docs/deployment.md).
+
+<img src="docs/assets/workspace-desktop.png" alt="Synthetic RSAT browser workspace with assessment scope, coverage, evidence gaps and prioritized findings" width="100%">
+
+<details>
+<summary>Mobile preview</summary>
+<img src="docs/assets/workspace-mobile.png" alt="Synthetic RSAT browser workspace on a mobile screen" width="320">
+</details>
+
+*Screenshots use synthetic evidence. BlinkHost publication is pending authenticated access; the release ZIP supports independent static hosting.*
+
 ## Quick start
 
 Download a portable binary from the [latest release](https://github.com/Kajahkura/RSAT_Project/releases/latest), verify its published checksum/provenance, or run from source. The legacy 1.0 release uses less reliable checks; it does not contain the features described here.

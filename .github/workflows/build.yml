@@ -126,7 +126,9 @@ jobs:
           PY
       - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
         with:
-          subject-path: release-assets/**/RSAT_*
+          subject-path: |
+            release-assets/**/RSAT_*
+            release-assets/**/RSAT-web-workspace.zip
       - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           files: release-assets/**/*

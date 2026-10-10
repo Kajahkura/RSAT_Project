@@ -11,11 +11,12 @@ Authorized scope: implement the advanced roadmap, verify it, push GitHub changes
 - [x] Read-only MCP interface, constrained companion API and self-hosted organization workspace.
 - [x] Secure TUF download client, explicit unverified attestation boundary and reviewed policy drafts.
 - [x] Web app: onboarding, local import, signature verification, encrypted history, graph/copilot workspace.
-- [ ] Native, security, interoperability and browser validation; GitHub release.
+- [x] Native, security, interoperability and browser validation.
+- [ ] GitHub 2.1.0 release publication and public-download verification.
 - [ ] BlinkHost compatibility/build/preview/publication and public URL verification.
 
 All proposed or incomplete capabilities must be labeled as such; no production evidence or credentials belong in the repository.
 
-Verified checkpoint: Python 3.13 suite passed 181 tests at 83.23% coverage; targeted connector/draft and workspace tests passed after fixes. Source is pushed. CI web typecheck/build passes; browser and native-platform validation still pending. BlinkHost secure credential access times out before API calls. No Node will run on the PC per user instruction.
+Verified checkpoint: final Python 3.13.13 suite passed 187 tests at 85.96% coverage; Ruff passed. Source `5fdac9a` passed all eight platform/Python jobs, both browser/web jobs and four native builds in run 37330491072. The downloaded static ZIP matched its checksum, and clean synthetic desktop/mobile previews were inspected. BlinkHost secure credential access remains unavailable: the 10 October PowerShell startup diagnostic timed out before any credential/API operation. No Node will run on the PC per user instruction.
 
-Final release gate: re-run native matrix after process-cleanup fix; publish the tag only after success. Hosted encrypted synchronization, TPM verifier, provider-specific connectors and managed fleet installation remain external/future work, explicitly labeled in docs/platform.md.
+Final release gate: implementation matrix passed after the process-cleanup fix; the 2.1.0 tag repeats the full matrix before publishing native and static-web assets with checksums/provenance. Verify public downloads after publication. Hosted encrypted synchronization, TPM verifier, provider-specific connectors and managed fleet installation remain external/future work, explicitly labeled in docs/platform.md.
