@@ -8,7 +8,7 @@ npm run build
 npm run dev
 ```
 
-Import RSAT 2.0 audit JSON or `.rsat.zip` bundles (20 MB input cap, 50 MB expanded bundle cap, 100 entries). Parsing and bundle verification run in a bounded Web Worker. Plain JSON remains unverified. Bundle hashes establish integrity; signature trust requires an independently supplied Ed25519 public PEM key. Verification uses WebCrypto and fails closed if the browser lacks Ed25519 support. No imported HTML is executed.
+Import RSAT 2.x audit JSON or `.rsat.zip` bundles (20 MB input cap, 50 MB expanded bundle cap, 100 entries). Parsing and bundle verification run in a bounded Web Worker. Plain JSON remains unverified. Bundle hashes establish integrity; signature trust requires an independently supplied Ed25519 public PEM key. Verification uses WebCrypto and fails closed if the browser lacks Ed25519 support. No imported HTML is executed.
 
 The assistant retrieves matching stored findings using keywords. It does not run model inference. The graph shows supported relationships and conditional simulations. Evidence is never uploaded by this app. The synthetic demo is clearly labeled.
 

@@ -4,7 +4,7 @@ The hosted application is the browser workspace. Native collection runs on the u
 
 For a repository connection, the root `blinkhost.yaml` selects `web/`. For a frontend-only VFS project, upload the files inside `web/` and use its manifest. Both select the same pinned dependency lock and `npm ci` / `npm run build` flow. Python native collectors and their crypto extensions are not BlinkHost WASI modules.
 
-A verified static ZIP and SHA-256 file are included with tagged GitHub releases. Any static host can serve that ZIP. Serve over HTTPS so standard browser cryptography is available. Preserve the app's Content Security Policy, use `X-Content-Type-Options: nosniff`, and disable third-party analytics or injected scripts if claiming local evidence processing.
+A verified static ZIP and SHA-256 file are included with tagged GitHub releases. [Version 2.1.0](https://github.com/Kajahkura/RSAT_Project/releases/tag/v2.1.0) is published; its public static ZIP checksum and build provenance were independently verified. Extract the archive and serve `index.html` and `assets/` at the site root. Any static host can serve that ZIP. Serve over HTTPS so standard browser cryptography is available. Preserve the app's Content Security Policy, use `X-Content-Type-Options: nosniff`, and disable third-party analytics or injected scripts if claiming local evidence processing.
 
 BlinkHost 2.5.2 supports remote resource commands:
 

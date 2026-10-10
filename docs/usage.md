@@ -95,7 +95,7 @@ rsat summary audit.json --model your-local-model --output draft-summary.json
 
 OSCAL produces paired assessment-plan/results files, with a required organization-supplied SSP link. The schemas are checked in the test pipeline. UNKNOWN/ERROR outcomes are marked explicitly in observations and target remarks; do not interpret them as measured compliance failure.
 
-The AI adapter uses a local Ollama-compatible endpoint and requires citations to actual finding IDs. Generated prose is unverified and never changes outcomes or executes commands. Review it against the deterministic report. Model licensing and hardware requirements are separate from RSAT's MIT license.
+The AI adapter uses a local Ollama-compatible endpoint to select typed claims bound to the exact audit hash. Contradictory outcomes, altered audit bindings and arbitrary model prose are rejected; displayed text is derived from stored findings. Imported evidence text remains untrusted. The adapter never changes outcomes or executes commands. Review selected claims against the deterministic report. Model licensing and hardware requirements are separate from RSAT's MIT license.
 
 ## Return codes
 
