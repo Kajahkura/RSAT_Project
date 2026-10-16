@@ -8,8 +8,8 @@ RSAT validates evidence interpretation, cryptographic boundaries, native executi
 |---|---|---|
 | Release 2.2.0 | Eight platform/Python jobs, 13 workspace module tests, both browser suites, four native builds and publication passed | [Release run 38980473315](https://github.com/Kajahkura/RSAT_Project/actions/runs/38980473315) |
 | Release 2.1.0 | Eight platform/Python jobs, both browser jobs, four native builds and publication passed | [Release run 38075110752](https://github.com/Kajahkura/RSAT_Project/actions/runs/38075110752) |
-| Source revision `ac3d64f` | Eight platform/Python jobs, both browser jobs and four native builds passed | [Run 38968086839](https://github.com/Kajahkura/RSAT_Project/actions/runs/38968086839) |
-| Hosted browser workspace | Public release files and live HTTPS security flows passed | [Run 38968086856](https://github.com/Kajahkura/RSAT_Project/actions/runs/38968086856) |
+| Source revision `ea99e6e` | Eight platform/Python jobs, 13 workspace module tests, both browser suites and four native builds passed | [Run 38982152259](https://github.com/Kajahkura/RSAT_Project/actions/runs/38982152259) |
+| Hosted browser workspace | Public release files and live HTTPS security flows passed | [Run 38982152272](https://github.com/Kajahkura/RSAT_Project/actions/runs/38982152272) |
 
 The release test matrix covers Python 3.11 and 3.13 on Linux x86_64, Windows x86_64, macOS Apple Silicon and macOS Intel. Statement coverage is enforced at 80%. The 2.1.0 Python suite contains 187 tests; Intel macOS explicitly skips one optional interoperability test because current `cryptography` releases do not support that architecture. All bundled crypto tests still run there.
 
@@ -37,7 +37,7 @@ Workspace module tests cover same-device comparisons, policy/scope changes, obse
 
 Browser checks exercise operating-system onboarding, bounded local JSON/ZIP imports, malformed input rejection, independently pinned Ed25519 signatures, wrong-key rejection, HTML injection resistance, encrypted IndexedDB storage, wrong-passphrase rejection, successful restoration with signer trust cleared, local deletion, assistance while the browser network is offline, desktop/mobile layouts and no evidence uploads.
 
-The [live workspace](https://rsat-workspace.blinkhost.website) serves the verified 2.1.0 frontend. Its JavaScript, worker, stylesheet, synthetic demo, license and hosting README match the release bytes. HTML changes are limited to reviewed inert search metadata; the CSP, referrer policy and executable scripts remain intact. HTTPS, HSTS and `nosniff` were verified. Desktop/mobile screenshots from the hosted checks were inspected.
+The [live workspace](https://rsat-workspace.blinkhost.website) serves the verified 2.2.0 frontend on BlinkHost deployment 292. Its JavaScript, worker, stylesheet, synthetic demo, license and hosting README match the release bytes. The published archive and all four native executables were independently checked against SHA-256 manifests and signed provenance bound to the release tag and source revision. HTML changes are limited to reviewed inert search metadata; the CSP, referrer policy and executable scripts remain intact. HTTPS, HSTS and `nosniff` were verified. Desktop/mobile screenshots from the hosted checks were inspected.
 
 ## Reproduce the source checks
 
