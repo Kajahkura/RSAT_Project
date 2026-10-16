@@ -6,6 +6,7 @@ RSAT validates evidence interpretation, cryptographic boundaries, native executi
 
 | Scope | Verified result | Evidence |
 |---|---|---|
+| Release 2.2.0 | Eight platform/Python jobs, 13 workspace module tests, both browser suites, four native builds and publication passed | [Release run 38980473315](https://github.com/Kajahkura/RSAT_Project/actions/runs/38980473315) |
 | Release 2.1.0 | Eight platform/Python jobs, both browser jobs, four native builds and publication passed | [Release run 38075110752](https://github.com/Kajahkura/RSAT_Project/actions/runs/38075110752) |
 | Source revision `ac3d64f` | Eight platform/Python jobs, both browser jobs and four native builds passed | [Run 38968086839](https://github.com/Kajahkura/RSAT_Project/actions/runs/38968086839) |
 | Hosted browser workspace | Public release files and live HTTPS security flows passed | [Run 38968086856](https://github.com/Kajahkura/RSAT_Project/actions/runs/38968086856) |
@@ -31,6 +32,8 @@ The Linux executable is built on Ubuntu 22.04 for a glibc 2.35 baseline. Older g
 Build provenance is distinct from Windows Authenticode and macOS notarization. The repository does not configure OS signing certificates. Hosted runners do not provide complete physical-device validation of BitLocker, TPM, Secure Boot, MDM, FileVault or successful backup restoration. WSL/container observations apply to the guest scope.
 
 ## Browser workspace
+
+Workspace module tests cover same-device comparisons, policy/scope changes, observation freshness, strict decision bindings and dates, selected exports, CSV formula protection, public-key fingerprints and redaction against hostile imported prose. Browser workflows also verify note preservation, encrypted decision/label storage, device grouping, downloadable report rendering and legacy snapshot restoration.
 
 Browser checks exercise operating-system onboarding, bounded local JSON/ZIP imports, malformed input rejection, independently pinned Ed25519 signatures, wrong-key rejection, HTML injection resistance, encrypted IndexedDB storage, wrong-passphrase rejection, successful restoration with signer trust cleared, local deletion, assistance while the browser network is offline, desktop/mobile layouts and no evidence uploads.
 
