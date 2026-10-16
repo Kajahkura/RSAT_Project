@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/hosted-web.yml
       - scripts/web_smoke.py
+      - scripts/workspace_flows.py
       - scripts/verify_hosted_web.py
       - docs/deployment.md
   workflow_dispatch:

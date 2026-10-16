@@ -1,4 +1,4 @@
-"""Verify live static files against the pinned, independently attested 2.1.0 release."""
+"""Verify live static files against the pinned, independently attested 2.2.0 release."""
 
 import hashlib
 import html
@@ -11,13 +11,13 @@ from urllib.request import Request, urlopen
 import zipfile
 
 BASE = "https://rsat-workspace.blinkhost.website"
-ARCHIVE_URL = "https://github.com/Kajahkura/RSAT_Project/releases/download/v2.1.0/RSAT-web-workspace.zip"
-ARCHIVE_SHA256 = "1c8f1a2361f291b2e7d3543291d90497d1861f4725a097abe28edd97206a7a03"
+ARCHIVE_URL = "https://github.com/Kajahkura/RSAT_Project/releases/download/v2.2.0/RSAT-web-workspace.zip"
+ARCHIVE_SHA256 = "5c641896f01837f80369dde7922b7eed07dcd79d3189a708f8860d3d225f6b2d"
 
 
 def fetch(url):
     request = Request(  # noqa: S310 -- caller uses only fixed release and hosted HTTPS URLs
-        url, headers={"User-Agent": "RSAT-hosted-verification/2.1", "Accept-Encoding": "identity"}
+        url, headers={"User-Agent": "RSAT-hosted-verification/2.2", "Accept-Encoding": "identity"}
     )
     with urlopen(request, timeout=45) as response:  # noqa: S310 -- fixed HTTPS URLs; no user input
         body = response.read(1_000_001)
@@ -93,14 +93,14 @@ def main():
             {
                 "verified_at": datetime.now(timezone.utc).isoformat(),
                 "url": BASE,
-                "release": "v2.1.0",
+                "release": "v2.2.0",
                 "release_archive_sha256": ARCHIVE_SHA256,
                 "files": results,
             },
             indent=2,
         ) + "\n"
     )
-    print("Hosted HTTPS files match release 2.1.0; HTML has only reviewed, inert search metadata additions.")
+    print("Hosted HTTPS files match release 2.2.0; HTML has only reviewed, inert search metadata additions.")
 
 
 if __name__ == "__main__":
