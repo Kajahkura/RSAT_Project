@@ -37,7 +37,11 @@ Every conclusion links to collected evidence and a versioned rule. PASS, FAIL, U
 | **Explicit remediation** | Manual plans plus a small allowlist with dry-run, backup, execution, verification, and rollback |
 | **Optional integrations** | osquery, existing SSH access, second-host TCP probes, offline advisories, OSV/KEV/EPSS, OSCAL, and local AI summaries |
 
-## New in 2.1
+## New in 2.2
+
+The browser workspace now guides collector installation and signer-key verification, groups encrypted assessments by device, separates policy changes from recorded regressions, and shows evidence freshness. Select findings for JSON/CSV export or an HTML client report with identifying metadata and imported prose omitted. Record remediation plans against the exact audit and save them inside encrypted local snapshots.
+
+## Advanced capabilities
 
 | Capability | Concrete behavior |
 |---|---|
@@ -52,7 +56,7 @@ See the [platform guide](docs/platform.md) for commands, trust boundaries and in
 
 ### Browser workspace
 
-Open the [live RSAT workspace](https://rsat-workspace.blinkhost.website), start with operating-system-specific onboarding, open evidence locally, inspect findings and relationships, and keep encrypted history in your browser. You can also download the static workspace from the [2.1.0 release](https://github.com/Kajahkura/RSAT_Project/releases/tag/v2.1.0) or follow the [self-hosting guide](docs/deployment.md).
+Open the [live RSAT workspace](https://rsat-workspace.blinkhost.website), start with operating-system-specific onboarding, open evidence locally, inspect findings and relationships, and keep encrypted history in your browser. You can also download the static workspace from the [2.2.0 release](https://github.com/Kajahkura/RSAT_Project/releases/tag/v2.2.0) or follow the [self-hosting guide](docs/deployment.md).
 
 <img src="docs/assets/workspace-desktop.png" alt="Synthetic RSAT browser workspace with assessment scope, coverage, evidence gaps and prioritized findings" width="100%">
 
@@ -61,7 +65,7 @@ Open the [live RSAT workspace](https://rsat-workspace.blinkhost.website), start 
 <img src="docs/assets/workspace-mobile.png" alt="Synthetic RSAT browser workspace on a mobile screen" width="320">
 </details>
 
-*Screenshots use synthetic evidence. The BlinkHost workspace serves release 2.1.0; imports and encrypted history stay in your browser.*
+*Screenshots use synthetic evidence. Imports, device labels and remediation notes stay in your browser.*
 
 ## Quick start
 

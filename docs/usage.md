@@ -100,3 +100,13 @@ The AI adapter uses a local Ollama-compatible endpoint to select typed claims bo
 ## Return codes
 
 `0`: workflow completed, including audits with findings. `1`: invalid input or workflow error. `2`: audit has failed controls when `--fail-on-findings` is specified. `130`: interrupted. A completed audit may still contain UNKNOWN/ERROR controls; inspect coverage.
+
+## Browser review workflow
+
+Open the [RSAT workspace](https://rsat-workspace.blinkhost.website). Choose your OS, verify the collector checksum/provenance, run its displayed command and import `audit.json` from the completed output folder. Import `evidence.rsat.zip` for bundle verification. Obtain `signing.pub.pem` independently from the owner and confirm its public DER SHA-256 fingerprint before pinning it. Plain JSON has no bundle signature. Decrypt `.rsat.enc` transfers with the native CLI first; HTML reports are not import files.
+
+For follow-up assessment, preserve the same engagement salt, device identity and collection context. Save each audit with an optional device label in encrypted Local history. Unlock device groups, open the newest assessment and compare an older snapshot. Review the displayed policy/scope changes and evidence gaps before interpreting recorded regressions or improvements. A changed result is not proof of its cause.
+
+Select findings for JSON/CSV exports or a redacted client HTML report. Full exports include finding text and decision notes; redacted reports omit imported prose and identifying metadata. Review the report before sharing, then print it to PDF if needed. These exports are unsigned excerpts; retain the original evidence bundle separately for verification.
+
+Record remediation decisions in each finding's evidence detail, then save an encrypted snapshot to retain them. A ready-for-recheck or accepted-risk decision does not modify the measured outcome. Collect a new assessment to verify changes. Browser-local history is not synchronized or backed up by the hosting service.

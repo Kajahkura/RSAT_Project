@@ -1,0 +1,12 @@
+import React,{useState,useEffect} from 'react';
+import {Finding} from './evidence';
+import {Decision, DecisionState, decisionLabels, decisionStates} from './decisions';
+
+export function DecisionEditor({finding,decision,hash,onSave,onRemove,onEdit}:{finding:Finding;decision?:Decision;hash:string;onSave:(decision:Decision)=>void;onRemove:()=>void;onEdit:()=>void}) {
+  const [state,setState]=useState<DecisionState>(decision?.state ?? 'planned');
+  const [owner,setOwner]=useState(decision?.owner ?? '');
+  const [note,setNote]=useState(decision?.note ?? '');
+  const [dueDate,setDueDate]=useState(decision?.dueDate ?? '');
+  useEffect(()=>{if(!decision){setState('planned');setOwner('');setNote('');setDueDate('');}},[decision]);
+  return <form className="decision-editor" onChange={onEdit} onSubmit={e=>{e.preventDefault();onSave({controlId:finding.id,state,owner,note,dueDate,updatedAt:new Date().toISOString(),auditHash:hash,ruleVersion:finding.rule_version});}}><h3>Remediation decision</h3><p>Record a plan for this audit and rule. A decision never changes the measured outcome. Use a fresh assessment to verify a fix.</p><div className="decision-fields"><div><label htmlFor="decision-state">Decision status</label><select id="decision-state" value={state} onChange={e=>setState(e.target.value as DecisionState)}>{decisionStates.map(s=><option key={s} value={s}>{decisionLabels[s]}</option>)}</select></div><div><label htmlFor="decision-owner">Responsible person or team</label><input id="decision-owner" value={owner} maxLength={120} onChange={e=>setOwner(e.target.value)} autoComplete="off"/></div><div><label htmlFor="decision-due">Review date</label><input id="decision-due" type="date" value={dueDate} onChange={e=>setDueDate(e.target.value)}/></div></div><label htmlFor="decision-note">Decision notes</label><textarea id="decision-note" value={note} maxLength={2000} rows={3} onChange={e=>setNote(e.target.value)}/><div className="action-row"><button className="button primary" type="submit">Record decision</button><button className="text-button" type="button" onClick={()=>{setState('planned');setOwner('');setNote('');setDueDate('');onRemove();}}>Remove decision</button></div>{decision && <p className="fine">Last recorded {new Date(decision.updatedAt).toLocaleString()}. Bound to this audit; it is not verification of remediation.</p>}<p className="fine">Save an encrypted snapshot in Local history to retain these notes. Free-text fields are excluded from redacted reports.</p></form>;
+}

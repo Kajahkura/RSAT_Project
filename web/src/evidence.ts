@@ -12,6 +12,9 @@ export function validateAudit(value:unknown):Audit {
   for(const field of ['audit_id','asset_id','platform','collector_version','os_release','architecture','scope','started_at']) if(!text(value[field])||!value[field])throw Error('Invalid audit field: '+field);
   if(!Number.isFinite(Date.parse(value.started_at as string)))throw Error('Invalid audit timestamp.');
   if(value.finished_at!==null&&(!text(value.finished_at)||!Number.isFinite(Date.parse(value.finished_at))))throw Error('Invalid finished timestamp.');
+  if(value.asset_id_scope!==undefined&&(!text(value.asset_id_scope)||!value.asset_id_scope))throw Error('Invalid device identity scope.');
+  if(value.policy!==undefined&&(!record(value.policy)||!text(value.policy.id)||!text(value.policy.version)))throw Error('Invalid policy identity.');
+  if(value.environment!==undefined&&(!record(value.environment)||!text(value.environment.kind)||!value.environment.kind))throw Error('Invalid collection environment.');
   for(const field of ['observations','findings','risks','vulnerabilities'])if(!Array.isArray(value[field])||(value[field] as unknown[]).length>50000)throw Error('Invalid audit list: '+field);
   if((value.findings as unknown[]).length>1000||(value.observations as unknown[]).length>10000)throw Error('Audit exceeds workspace limits.');
   const ids=new Set<string>();
@@ -29,4 +32,3 @@ export function canonical(value:unknown):string {
 }
 export function metrics(audit:Audit){const applicable=audit.findings.filter(f=>f.status!=='NOT_APPLICABLE');const assessed=applicable.filter(f=>f.status==='PASS'||f.status==='FAIL').length;return {applicable:applicable.length,assessed,coverage:applicable.length?Math.round(100*assessed/applicable.length):0,failed:applicable.filter(f=>f.status==='FAIL').length,gaps:applicable.filter(f=>f.status==='UNKNOWN'||f.status==='ERROR').length,passed:applicable.filter(f=>f.status==='PASS').length};}
 export function retrieve(audit:Audit,question:string):Finding[]{const terms=question.toLowerCase().split(/\W+/).filter(x=>x.length>3);const candidates=audit.findings.filter(f=>f.status!=='NOT_APPLICABLE');const scored=candidates.map(f=>({f,score:terms.reduce((n,t)=>n+Number((f.title+' '+f.id+' '+f.details).toLowerCase().includes(t)),0)})).filter(x=>x.score>0);return scored.sort((a,b)=>b.score-a.score).slice(0,5).map(x=>x.f);}
-export function drift(before:Audit,after:Audit){if(before.asset_id!==after.asset_id)throw Error('Choose audits of the same asset.');return after.findings.flatMap(f=>{const old=before.findings.find(x=>x.id===f.id);return old&&old.status!==f.status?[{id:f.id,before:old.status,after:f.status,ruleChanged:old.rule_version!==f.rule_version}]:[];});}

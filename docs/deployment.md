@@ -44,6 +44,6 @@ GitHub Actions automation can use an exact-subject BlinkHost workload identity a
 
 ## Verify a hosted deployment
 
-The [hosted validation workflow](../.github/workflows/hosted-web.yml) checks the public RSAT site against a pinned release archive, then tests onboarding, local imports, signature verification, injection resistance, encrypted history, offline assistance and desktop/mobile layouts on the HTTPS origin. It can be rerun from GitHub Actions without BlinkHost credentials.
+The [hosted validation workflow](../.github/workflows/hosted-web.yml) checks the public RSAT site against a pinned release archive, then tests onboarding, local imports, signature verification, injection resistance, encrypted decisions, device reassessment, report redaction, legacy history, offline assistance and desktop/mobile layouts on the HTTPS origin. It can be rerun from GitHub Actions without BlinkHost credentials.
 
 When publishing a different release, update the archive URL and checksum in `scripts/verify_hosted_web.py` after verifying its release provenance. Host-added search metadata must remain within the reviewed verifier allowlist; executable script changes fail verification.

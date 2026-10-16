@@ -1,6 +1,12 @@
 # Changelog
 
-## Source updates — 2026-10-16
+## 2.2.0 — 2026-10-16
+
+- Added collector download/checksum instructions, import troubleshooting and independently verified signing-key fingerprints.
+- Added encrypted device labels, unlocked device groups, configurable freshness windows and same-device reassessment with separate policy, scope, coverage and outcome changes.
+- Added selected JSON/CSV exports, spreadsheet formula protection and local redacted client reports with print-to-PDF guidance.
+- Added audit/rule-bound remediation decisions, unsaved-note protection and backward-compatible encrypted history restoration.
+- Added browser and module tests for reassessment, report privacy, decisions and legacy snapshot compatibility.
 
 - Policy validation is exposed as `policy-review` when running from source, with the same citation, approval and outcome-fixture requirements.
 - Updated public hosting instructions and validation references for the live browser workspace.

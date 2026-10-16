@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright
 from rsat.bundle import generate_keys, create_bundle
 from rsat.model import canonical
+from workspace_flows import verify_workspace
 
 root = Path(__file__).resolve().parents[1]
 
@@ -133,6 +134,10 @@ try:
         page.get_by_role("button", name="Delete local history").click()
         page.get_by_role("status").filter(has_text="All local encrypted snapshots deleted").wait_for()
         assert page.locator(".history-row").count() == 0
+        if not os.environ.get("RSAT_WEB_BASE_URL") or "2.2.0" in page.locator(".version").inner_text():
+            verify_workspace(page, root, tmp)
+        else:
+            print("Hosted release 2.1 remains active; release 2.2 workflows run after publication.")
         page.get_by_role("button", name="Overview", exact=True).click()
         page.set_viewport_size({"width": 390, "height": 844})
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")

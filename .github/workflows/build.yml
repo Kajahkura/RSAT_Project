@@ -65,6 +65,10 @@ jobs:
         working-directory: web
       - run: npm run build
         working-directory: web
+      - name: Test reassessment, decisions, exports and redaction
+        run: |
+          web/node_modules/.bin/esbuild web/tests/workspace.test.ts --bundle --platform=node --format=esm --outfile=/tmp/rsat-workspace-tests.mjs
+          node --test /tmp/rsat-workspace-tests.mjs
       - run: python -m pip install -r requirements-visual.txt -e ".[crypto]"
       - run: python -m playwright install --with-deps chromium
       - run: python scripts/ci_browser.py
