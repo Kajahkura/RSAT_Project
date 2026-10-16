@@ -46,12 +46,20 @@ export function compareAudits(before:Audit, after:Audit):Comparison {
 }
 
 export function freshness(audit:Audit, now:number, windowHours=24):{label:string;detail:string;kind:string} {
-  if(audit.finished_at === null) return {label:'Incomplete assessment',detail:'This audit has no completion timestamp.',kind:'unknown'};
-  const finished = Date.parse(audit.finished_at);
-  if(finished < Date.parse(audit.started_at)) return {label:'Inconsistent timestamps',detail:'Completion precedes the start of collection.',kind:'unknown'};
-  const age = now - finished;
+  const timestamps=audit.observations.filter(o=>o.collected_at!==undefined).map(o=>o.collected_at!);
+  return freshnessFromTimes(audit.started_at,audit.finished_at,timestamps,audit.observations.length-timestamps.length,now,windowHours);
+}
+export function freshnessFromTimes(started:string,completed:string|null,times:string[],missing:number,now:number,windowHours=24):{label:string;detail:string;kind:string} {
+  if(completed === null) return {label:'Incomplete assessment',detail:'This audit has no completion timestamp.',kind:'unknown'};
+  const finished = Date.parse(completed);
+  if(finished < Date.parse(started)) return {label:'Inconsistent timestamps',detail:'Completion precedes the start of collection.',kind:'unknown'};
+  const timestamps=times.map(time=>Date.parse(time));
+  if(timestamps.some(time=>time>now+300000))return {label:'Future evidence timestamp',detail:'Check observation and collector clocks before relying on freshness.',kind:'unknown'};
+  const oldest=Math.min(finished,...timestamps);
+  const age = now - oldest;
   if(age < -300000) return {label:'Future timestamp',detail:'Check the collector and browser clocks before relying on freshness.',kind:'unknown'};
   const hours = Math.max(0,age / 3600000);
   const ageLabel = hours < 1 ? 'less than an hour ago' : hours < 48 ? Math.floor(hours) + ' hours ago' : Math.floor(hours / 24) + ' days ago';
-  return {label:hours <= windowHours ? 'Within review window' : 'Reassessment due',detail:'Collected ' + ageLabel + '. Review window: ' + windowHours + ' hours. This is evidence age, not continuous monitoring.',kind:hours <= windowHours ? 'pass' : 'unknown'};
+  const basis=timestamps.length ? 'Oldest recorded evidence: ' : 'Assessment completed: ';
+  return {label:hours <= windowHours ? 'Within review window' : 'Reassessment due',detail:basis + ageLabel + '. Review window: ' + windowHours + ' hours. ' + (missing ? missing+' observations have no individual timestamp. ' : '') + 'This is evidence age, not continuous monitoring.',kind:hours <= windowHours ? 'pass' : 'unknown'};
 }

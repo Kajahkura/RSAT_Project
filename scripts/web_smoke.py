@@ -107,7 +107,7 @@ try:
         bundle = create_bundle(
             {"audit.json": canonical(audit)}, tmp / "signed.rsat.zip", keys / "signing.key.pem"
         )
-        page.locator(".trust-settings summary").click()
+        page.locator(".trust-settings > summary").click()
         page.locator("#pinned").fill((keys / "signing.pub.pem").read_text())
         page.locator("input[type=file]").set_input_files(bundle)
         page.get_by_text("Verified signature · independently pinned key", exact=True).wait_for(timeout=30000)

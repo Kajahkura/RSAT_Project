@@ -69,6 +69,15 @@ test('freshness handles review windows, incomplete, future and inconsistent evid
   assert.equal(freshness({...audit,finished_at:'2025-01-01T00:00:00Z'},now).label,'Inconsistent timestamps');
 });
 
+test('a recent audit cannot hide stale or future observation timestamps',()=>{
+  const audit=next(fixture()),now=Date.parse('2026-10-02T12:00:00Z');
+  audit.observations[0].collected_at='2026-09-01T00:00:00Z';
+  assert.equal(freshness(audit,now).label,'Reassessment due');
+  assert.match(freshness(audit,now).detail,/Oldest recorded evidence/);
+  audit.observations[0].collected_at='2026-12-01T00:00:00Z';
+  assert.equal(freshness(audit,now).label,'Future evidence timestamp');
+});
+
 test('remediation decisions are strictly audit/rule-bound and never alter outcomes',async()=>{
   const audit=fixture(), hash=await auditHash(audit), d=await decision(audit), original=canonical(audit);
   assert.equal(validateDecisions([d],audit,hash)[0].state,'ready_for_recheck');

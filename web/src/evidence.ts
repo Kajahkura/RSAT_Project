@@ -18,7 +18,7 @@ export function validateAudit(value:unknown):Audit {
   for(const field of ['observations','findings','risks','vulnerabilities'])if(!Array.isArray(value[field])||(value[field] as unknown[]).length>50000)throw Error('Invalid audit list: '+field);
   if((value.findings as unknown[]).length>1000||(value.observations as unknown[]).length>10000)throw Error('Audit exceeds workspace limits.');
   const ids=new Set<string>();
-  for(const o of value.observations as unknown[]){if(!record(o)||!text(o.id)||!o.id||ids.has(o.id)||!['OK','UNKNOWN','ERROR','NOT_APPLICABLE'].includes(String(o.state)))throw Error('Invalid or duplicate observation.');ids.add(o.id);}
+  for(const o of value.observations as unknown[]){if(!record(o)||!text(o.id)||!o.id||ids.has(o.id)||!['OK','UNKNOWN','ERROR','NOT_APPLICABLE'].includes(String(o.state)))throw Error('Invalid or duplicate observation.');if(o.collected_at!==undefined&&(!text(o.collected_at)||!Number.isFinite(Date.parse(o.collected_at))))throw Error('Invalid observation timestamp.');ids.add(o.id);}
   ids.clear();
   for(const f of value.findings as unknown[]){if(!record(f)||!text(f.id)||!f.id||ids.has(f.id)||!outcomes.includes(f.status as Outcome)||!strings(f.evidence_ids)||!['info','low','medium','high','critical'].includes(String(f.severity)))throw Error('Invalid or duplicate finding.');for(const k of ['title','details','remediation','rule_version'])if(!text(f[k]))throw Error('Invalid finding field: '+k);ids.add(f.id);}
   for(const r of value.risks as unknown[]){if(!record(r)||!strings(r.evidence_ids)||!strings(r.factors))throw Error('Invalid risk evidence.');for(const k of ['id','title','severity','limitations'])if(!text(r[k]))throw Error('Invalid risk field.');}
