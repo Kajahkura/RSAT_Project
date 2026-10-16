@@ -66,9 +66,18 @@ export async function saveHistory(audit:Audit,password:string,keep:number,state:
   const iv=crypto.getRandomValues(new Uint8Array(12));
   const id=crypto.randomUUID();
   const ciphertext=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:new TextEncoder().encode(id)},await key(password,salt),plaintext);
-  await transaction('readwrite',store=>store.put({id,created:Date.now(),salt:[...salt],iv:[...iv],ciphertext}));
-  const rows=await listHistory();
-  for(const row of rows.slice(keep)) await transaction('readwrite',store=>store.delete(row.id));
+  await transaction('readwrite',store=>{
+    const saved=store.put({id,created:Date.now(),salt:[...salt],iv:[...iv],ciphertext});
+    const rows:Saved[]=[];
+    const cursor=store.openCursor();
+    cursor.onsuccess=()=>{
+      const entry=cursor.result;
+      if(entry){rows.push({id:entry.value.id,created:entry.value.created});entry.continue();return;}
+      rows.sort((a,b)=>b.created-a.created || (a.id===id ? -1 : b.id===id ? 1 : a.id.localeCompare(b.id)));
+      for(const row of rows.slice(keep))store.delete(row.id);
+    };
+    return saved;
+  });
   return listHistory();
 }
 export async function loadSnapshot(row:Saved,password:string):Promise<Snapshot> {

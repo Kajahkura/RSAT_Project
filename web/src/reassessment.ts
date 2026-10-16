@@ -53,6 +53,7 @@ export function freshnessFromTimes(started:string,completed:string|null,times:st
   if(completed === null) return {label:'Incomplete assessment',detail:'This audit has no completion timestamp.',kind:'unknown'};
   const finished = Date.parse(completed);
   if(finished < Date.parse(started)) return {label:'Inconsistent timestamps',detail:'Completion precedes the start of collection.',kind:'unknown'};
+  if(finished>now+300000)return {label:'Future timestamp',detail:'Check the collector and browser clocks before relying on freshness.',kind:'unknown'};
   const timestamps=times.map(time=>Date.parse(time));
   if(timestamps.some(time=>time>now+300000))return {label:'Future evidence timestamp',detail:'Check observation and collector clocks before relying on freshness.',kind:'unknown'};
   const oldest=Math.min(finished,...timestamps);
