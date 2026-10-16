@@ -46,7 +46,8 @@ try:
     with tempfile.TemporaryDirectory() as temporary, sync_playwright() as p:
         tmp = Path(temporary)
         browser = p.chromium.launch(headless=True, args=["--disable-gpu", "--no-zygote", "--single-process"])
-        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        context = browser.new_context(viewport={"width": 1440, "height": 1000})
+        page = context.new_page()
         errors = []
         evidence_requests = []
         page.on("pageerror", lambda e: errors.append(str(e)))
