@@ -15,9 +15,9 @@ def test_official_oscal_schemas(audit):
         if isinstance(instance, str) and not regex.search(pattern, instance):
             yield jsonschema.ValidationError("OSCAL Unicode pattern mismatch")
 
-    validator = extend(jsonschema.Draft7Validator, {"pattern": unicode_pattern})
     for name, data in zip(("assessment-plan", "assessment-results"), oscal(audit)):
         schema = json.loads((Path(__file__).parent / "schemas" / (name + ".json")).read_text())
+        validator = extend(jsonschema.validators.validator_for(schema), {"pattern": unicode_pattern})
         validator(schema).validate(data)
 
 

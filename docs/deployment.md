@@ -1,31 +1,49 @@
-# Deploy the browser workspace
+# Host the browser workspace
 
-The public [RSAT Evidence Workspace](https://rsat-workspace.blinkhost.website) is live on BlinkHost. Production release `291` was activated on 16 October 2026 for project `1e3b948b-e02b-412f-98d5-a6a2f2b4639a`. It serves the verified 2.1.0 frontend. Onboarding and the synthetic demo need no sign-in.
+Open the [RSAT Evidence Workspace](https://rsat-workspace.blinkhost.website) to use operating-system onboarding, explore the synthetic demo, or import your own evidence locally. No account is required.
 
-The hosted application is the browser workspace. Native collection runs on the user's endpoint. Hosted files contain synthetic demo evidence only. The app does not require databases, outbound inference, customer accounts or audit uploads.
+The hosted application is a static React/TypeScript frontend. Native collection runs on the endpoint. Audit files are processed in the browser; encrypted history is saved locally in IndexedDB. Hosting does not require a database, an inference service or an evidence-upload API.
 
-For a repository connection, the root `blinkhost.yaml` selects `web/`. For a frontend-only VFS project, upload the files inside `web/` and use its manifest. Both select the same pinned dependency lock and `npm ci` / `npm run build` flow. Python native collectors and their crypto extensions are not BlinkHost WASI modules.
+## Deploy a release archive
 
-A verified static ZIP and SHA-256 file are included with tagged GitHub releases. [Version 2.1.0](https://github.com/Kajahkura/RSAT_Project/releases/tag/v2.1.0) is published; its public static ZIP checksum and build provenance were independently verified. Extract the archive and serve `index.html` and `assets/` at the site root. Any static host can serve that ZIP. Serve over HTTPS so standard browser cryptography is available. Preserve the app's Content Security Policy, use `X-Content-Type-Options: nosniff`, and disable third-party analytics or injected scripts if claiming local evidence processing.
+Download `RSAT-web-workspace.zip` and its SHA-256 manifest from the [latest release](https://github.com/Kajahkura/RSAT_Project/releases/latest). Verify the checksum and [GitHub build provenance](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations) before deployment.
 
-For this frontend-only deployment, BlinkHost's dashboard contract accepts a prebuilt ZIP with `POST /api/deployments/upload/` using multipart fields `project_id`, `environment_name=Production` and `file=deployment.zip`. The CLI's authenticated API client was used through a task-local multipart adapter because its generic `api` command accepts JSON. No local web build was run. Follow the returned `/api/deployment-requests/REQUEST_ID/` until completion, inspect the resulting deployment and confirm current public routing. This upload flow published directly; a separate activation was unnecessary.
+Extract the archive and serve its contents at the site root:
 
-The exact tagged frontend source and MIT license were uploaded into the project VFS and all 14 files were read back and compared by SHA-256. The published ZIP came from [release run 38075110752](https://github.com/Kajahkura/RSAT_Project/actions/runs/38075110752), tag `v2.1.0`, source `53316e839cc9957c7f5e67df0a1942c08de47e18`. Its SHA-256 is `1c8f1a2361f291b2e7d3543291d90497d1861f4725a097abe28edd97206a7a03`. BlinkHost normalizes the archive, so its artifact digest is different (`45199bec48ca695ceddb325fb2dd3b7c7782ef5529bdd8c5a90cb61fb62fddeb`). All six non-HTML public files match the release exactly. The public HTML retains the release's CSP, referrer policy and executable scripts; only canonical, Open Graph, Twitter and inert JSON-LD search metadata are added. HTTPS, HSTS and `nosniff` were verified.
-
-BlinkHost 2.5.2 also supports Git-connected resource commands:
-
-```sh
-blinkhost projects get PROJECT_ID --json
-blinkhost builds create --data @reviewed-build.json --json
-blinkhost builds wait BUILD_ID --json
-blinkhost previews get PREVIEW_ID --json
-blinkhost deployments action DEPLOYMENT_ID activate --data @reviewed-publication.json --idempotency-key SAVED_REQUEST_KEY --json
+```text
+index.html
+assets/
+demo-audit.json
+LICENSE
+README.md
 ```
 
-Payloads must use the effective account's current resource contract. Select exact reviewed source, inspect the immutable verified artifact and preview, then publish that artifact. Save a unique publication key before submission. If the response is uncertain, use `deployments publication-lookup --idempotency-key SAVED_REQUEST_KEY`; do not replace it with a new request. Verify release routing and the public response before marking publication complete.
+Use HTTPS so browser cryptography is available. Preserve the HTML Content Security Policy and referrer policy, set `X-Content-Type-Options: nosniff`, and avoid injecting analytics or executable third-party scripts. The demo contains synthetic evidence only. Keep the MIT license with redistributed copies.
 
-GitHub-hosted CLI automation can use an exact-subject BlinkHost workload identity and GitHub OIDC, avoiding long-lived repository secrets. Registration requires an authenticated BlinkHost account and appropriate scopes. No workload identity has been provisioned; publication currently uses an authenticated CLI session.
+## Build from source
 
-The user subsequently authorized the installed BlinkHost CLI, a narrow exception to the earlier prohibition on local Node execution. Node ran only the published CLI and its transport adapter. Web builds and browser checks continue to run in GitHub CI. Linux authentication used an isolated encrypted Secret Service; a loopback-only relay forwarded requests to the official HTTPS API with TLS verification. Credentials were kept out of the repository and source uploads.
+The frontend uses the pinned dependency lock in `web/`:
 
-The [hosted validation workflow](../.github/workflows/hosted-web.yml) checks the live files against the pinned public release, then exercises onboarding, imports, signature trust, injection resistance, encrypted history, offline retrieval and responsive layouts on the real HTTPS origin. It can be rerun manually from GitHub Actions without BlinkHost credentials. When publishing a new frontend release, update the pinned archive checksum in `scripts/verify_hosted_web.py` after independent release verification.
+```sh
+cd web
+npm ci
+npm run build
+```
+
+Serve the generated `web/dist/` files over HTTPS. The [build workflow](../.github/workflows/build.yml) runs the frontend build and browser security checks before packaging release archives.
+
+## BlinkHost
+
+Create a frontend project and publish the verified static archive. For a repository connection, the root `blinkhost.yaml` selects `web/`. For a frontend-only VFS project, use the files inside `web/` and its manifest. Both specify the pinned dependency lock, `npm ci`, `npm run build` and `dist` output. Python native collectors and their crypto extensions run on endpoints rather than as BlinkHost WASI modules.
+
+BlinkHost's deployment-upload API accepts `POST /api/deployments/upload/` with multipart fields `project_id`, `environment_name` and `file`. Use the current authenticated API contract for your account. Follow the returned deployment-request status URL, inspect the resulting deployment and confirm that public routing serves the reviewed artifact. The CLI's generic `api` command accepts JSON; binary uploads require the dashboard or a multipart-capable authenticated client.
+
+For Git-connected deployments, BlinkHost also provides build, preview and publication resource commands. Save a publication idempotency key before activation. Recover an uncertain request with `deployments publication-lookup --idempotency-key SAVED_REQUEST_KEY`; replacing the key can create a second operation. Verify the active release and public files after publication.
+
+GitHub Actions automation can use an exact-subject BlinkHost workload identity and GitHub OIDC. Configure scopes for the intended project and environment, and keep credentials out of repository files.
+
+## Verify a hosted deployment
+
+The [hosted validation workflow](../.github/workflows/hosted-web.yml) checks the public RSAT site against a pinned release archive, then tests onboarding, local imports, signature verification, injection resistance, encrypted history, offline assistance and desktop/mobile layouts on the HTTPS origin. It can be rerun from GitHub Actions without BlinkHost credentials.
+
+When publishing a different release, update the archive URL and checksum in `scripts/verify_hosted_web.py` after verifying its release provenance. Host-added search metadata must remain within the reviewed verifier allowlist; executable script changes fail verification.

@@ -182,7 +182,7 @@ def parser():
     c.add_argument("challenge", type=Path)
     c.add_argument("--key", type=Path, required=True)
     c.add_argument("--output", type=Path, required=True)
-    for name in ("mlbom", "external", "policy-draft", "csaf"):
+    for name in ("mlbom", "external", "policy-review", "csaf"):
         c = sub.add_parser(name, help="Validate and import/export " + name)
         c.add_argument("source", type=Path)
         c.add_argument("--output", type=Path)
@@ -517,14 +517,14 @@ def main(argv=None):
             from .organization import enrollment_proof
 
             emit(enrollment_proof(read_json(args.challenge), args.key), args.output)
-        elif args.command in {"mlbom", "external", "policy-draft", "csaf"}:
+        elif args.command in {"mlbom", "external", "policy-review", "csaf"}:
             from .interoperability import mlbom, external_evidence, csaf, verify_document
-            from .drafts import validate_draft
+            from .policy_review import validate_policy_review
 
             result = (
                 csaf(verify_document(read_json(args.source), args.publisher_key))
                 if args.command == "csaf"
-                else {"mlbom": mlbom, "external": external_evidence, "policy-draft": validate_draft}[
+                else {"mlbom": mlbom, "external": external_evidence, "policy-review": validate_policy_review}[
                     args.command
                 ](read_json(args.source))
             )

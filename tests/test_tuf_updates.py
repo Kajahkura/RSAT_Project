@@ -121,7 +121,7 @@ def test_tuf_rejects_tampered_and_expired_targets(tmp_path):
             )
 
 
-@pytest.mark.parametrize("target", ["../escape", "/root/collector", "script;evil"])
+@pytest.mark.parametrize("target", ["../escape", "/var/tmp/collector", "script;evil"])
 def test_update_paths_are_constrained(tmp_path, target):
     with pytest.raises(ValueError):
         fetch_update(

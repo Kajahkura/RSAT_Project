@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
-from jsonschema import Draft7Validator
+from jsonschema.validators import validator_for
 from referencing import Registry, Resource
 
 from rsat.interoperability import sbom, mlbom
@@ -21,7 +21,8 @@ def test_cyclonedx_exports_against_official_schema(audit):
             + ("bom-1.6.schema.json" if name == "cyclonedx-1.6.json" else name),
             Resource.from_contents(schema),
         )
-    validator = Draft7Validator(schemas["cyclonedx-1.6.json"], registry=registry)
+    schema = schemas["cyclonedx-1.6.json"]
+    validator = validator_for(schema)(schema, registry=registry)
     documents = [
         sbom(audit),
         mlbom(
@@ -46,7 +47,7 @@ def test_cyclonedx_exports_against_official_schema(audit):
 
 def test_csaf_publisher_document_schema_and_expiry():
     from datetime import datetime, timezone, timedelta
-    from jsonschema import Draft202012Validator, FormatChecker
+    from jsonschema import FormatChecker
     from rsat.interoperability import csaf
 
     now = datetime.now(timezone.utc).isoformat()
@@ -78,7 +79,7 @@ def test_csaf_publisher_document_schema_and_expiry():
         ],
     }
     schema = json.loads((Path(__file__).parent / "schemas/csaf-2.0.json").read_text())
-    Draft202012Validator(schema, format_checker=FormatChecker()).validate(document)
+    validator_for(schema)(schema, format_checker=FormatChecker()).validate(document)
     assert csaf(document)["vulnerabilities"][0]["product_status"]["known_affected"] == ["vendor-product-1"]
     document["document"]["tracking"]["current_release_date"] = (
         datetime.now(timezone.utc) - timedelta(days=31)

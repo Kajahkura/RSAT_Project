@@ -1,58 +1,48 @@
-# Validation record
+# Validation
 
-Validation is performed against the source revision, with platform and scope stated explicitly. A passing test suite is not proof that every endpoint configuration is covered.
+RSAT validates evidence interpretation, cryptographic boundaries, native execution and browser behavior. Passing tests establish the tested behavior and platform scope; they do not certify the health or compliance of an endpoint.
 
-The local development environment is Linux x86_64. The expanded suite passed 151 tests on Python 3.11.15 and 3.13.13 with 86.72% statement coverage. Coverage is enforced at 80% in CI. Linux read-only native smoke and standalone executable audit/key-generation checks passed. A CLI signing/encryption/decryption/pinned-key verification round trip passed.
+## Published validation
 
-Cryptographic checks include RFC 8032 Ed25519 and RFC 7748 X25519 vectors, a NIST AES-256-GCM vector, low-order recipient rejection, key-type boundaries, and interoperability with the prior backend's PEM keys and encrypted envelopes. PyCryptodome supplies the primitives on every supported architecture. Interoperability with current `cryptography` runs where upstream supports that package; only that optional cross-library test is skipped on Intel macOS.
+| Scope | Verified result | Evidence |
+|---|---|---|
+| Release 2.1.0 | Eight platform/Python jobs, both browser jobs, four native builds and publication passed | [Release run 38075110752](https://github.com/Kajahkura/RSAT_Project/actions/runs/38075110752) |
+| Source revision `ac3d64f` | Eight platform/Python jobs, both browser jobs and four native builds passed | [Run 38968086839](https://github.com/Kajahkura/RSAT_Project/actions/runs/38968086839) |
+| Hosted browser workspace | Public release files and live HTTPS security flows passed | [Run 38968086856](https://github.com/Kajahkura/RSAT_Project/actions/runs/38968086856) |
 
-Checks include malformed imported references, exception/risk structures and vulnerability priority fields, plus the original firewall/BitLocker/update regressions, malformed and missing evidence, native failure isolation, subprocess deadlines, command argument boundaries, report escaping, policy constraints, exception expiry, comparison semantics, exact-version intelligence, SSH injection prevention, loopback probes, signing trust, wrong keys, tampered data/header, encryption round trips, exclusive output creation, and remediation dry-run/preconditions/backup/verification/rollback.
+The release test matrix covers Python 3.11 and 3.13 on Linux x86_64, Windows x86_64, macOS Apple Silicon and macOS Intel. Statement coverage is enforced at 80%. The 2.1.0 Python suite contains 187 tests; Intel macOS explicitly skips one optional interoperability test because current `cryptography` releases do not support that architecture. All bundled crypto tests still run there.
 
-`scripts/native_smoke.py` runs read-only collections on native runners and independently compares Windows/macOS firewall observations. Windows CI additionally parses every generated PowerShell query with PowerShell's language parser. A native smoke pass is not a complete physical device laboratory: runner hardware may not provide BitLocker, TPM, Secure Boot, MDM, FileVault, or backups.
+The current source suite passes 188 tests on Linux with Python 3.13 and 86.13% statement coverage, including policy-review CLI approval and inconsistent-fixture rejection.
 
-The build matrix targets Linux x86_64 on an Ubuntu 22.04/glibc 2.35 baseline, Windows x86_64, macOS Apple Silicon, and macOS Intel. Every standalone artifact is launched for version, audit, signed/encrypted evidence, decryption, pinned-key verification, and wrong-key rejection smoke checks. Python 3.11 and 3.13 run the test matrix. Signing and crypto are included in portable builds.
+## Evidence and cryptography
 
-Release checksums and a CycloneDX inventory record the build environment. GitHub artifact attestations are separate from OS Authenticode signing and macOS notarization. No certificates are configured in this repository; published executables must not claim those OS signing properties.
+Regression checks cover false firewall and encryption passes, malformed or missing evidence, policy applicability, expired exceptions, changed rule versions, input/output limits, command injection, collection deadlines and process-exit races. Remediation checks cover target binding, preconditions, dry-run, backup, verification and rollback.
 
-The synthetic generated report passed Chromium checks at 1280px desktop and 390px mobile widths, including filtering and no document-level horizontal overflow. Screenshots are in `docs/assets/`. Official OSCAL 1.1.3 schemas are used for paired export validation. Imported customer evidence and external advisories are not evaluated against production client environments during development.
+Cryptographic verification includes RFC 8032 Ed25519, RFC 7748 X25519 and NIST AES-256-GCM vectors, wrong-key and tamper rejection, low-order recipient rejection, key-type boundaries and envelope interoperability. Signing trust requires an independently pinned key.
 
-[Native validation run 36917384385](https://github.com/Kajahkura/RSAT_Project/actions/runs/36917384385), source revision `ca87153`, completed successfully. All eight Python/platform test jobs, the browser job, and four native executable builds passed. Intel macOS runs 150 tests plus one explicitly skipped cross-library check because current `cryptography` no longer supports that architecture; every bundle/vector/tamper test still runs. Windows and both Mac architectures passed independent native collection smoke checks, and every packaged artifact passed the audit/sign/encrypt/decrypt/pinned-key/wrong-key workflow. The Linux standalone workflow was also repeated locally with the final backend.
+Platform tests also cover signed history, replay/expiry/revocation boundaries, subject-bound connectors, trusted VEX/CSAF, official OSCAL and CycloneDX schemas, and TUF metadata tamper, expiry and rollback protection. Upstream schema fixtures retain their original identifiers and notices.
 
-During development, native CI exposed an update-policy PowerShell syntax error and a Windows CIM startup timeout; both were corrected. The crypto backend was replaced to avoid an advisory-affected older Intel Mac dependency. The [workflow history](https://github.com/Kajahkura/RSAT_Project/actions/workflows/build.yml) retains those failures and their successful follow-up runs. Subsequent release runs repeat the full matrix before publication.
+## Native artifacts
 
-Public-download verification found that the initial 2.0.0 Ubuntu 24.04 executable required GLIBC_2.38 and could not launch on Ubuntu 22.04. Release 2.0.1 builds Linux on Ubuntu 22.04. [Release run 36920113534](https://github.com/Kajahkura/RSAT_Project/actions/runs/36920113534), source revision `78f4b80`, passed all eight test jobs, browser validation, all four native builds and publication. The public Linux 2.0.1 download matched its published SHA-256 and then passed version, native audit, signing, encryption, decryption and pinned-key verification locally on glibc 2.35. The final local Python 3.13 run passed all 151 tests with 86.58% coverage; the earlier cross-version runs reached 86.72%. Older glibc, musl-based distributions and other Linux architectures need source installation or their own native builds.
+Every standalone build is launched for version, audit, signed/encrypted evidence, decryption, pinned-key verification, wrong-key rejection, signed snapshots and graph/SBOM exports. Native collection smoke checks independently compare available Windows and macOS firewall observations. Windows CI parses generated PowerShell queries with the native language parser.
 
+The Linux executable is built on Ubuntu 22.04 for a glibc 2.35 baseline. Older glibc, musl-based distributions and other Linux architectures require source installation or compatible native builds. Public release binaries and the static web archive were independently checked against published SHA-256 values and Sigstore provenance bound to the repository workflow, release tag and source revision.
 
-## RSAT 2.1 validation checkpoint
+Build provenance is distinct from Windows Authenticode and macOS notarization. The repository does not configure OS signing certificates. Hosted runners do not provide complete physical-device validation of BitLocker, TPM, Secure Boot, MDM, FileVault or successful backup restoration. WSL/container observations apply to the guest scope.
 
-On 5 October 2026, the expanded local Python 3.13 suite passed 184 tests at 84.97% statement coverage. Additional targeted tests passed for connector transport/subject/size boundaries, independent policy fixtures, AI contradiction rejection, partial-config failure preservation, signed history, tenant/replay/expiry/revocation, pinned VEX, CycloneDX/CSAF schemas and TUF tamper/expiry/rollback protection.
+## Browser workspace
 
-[Run 37327430073](https://github.com/Kajahkura/RSAT_Project/actions/runs/37327430073), source `978e289`, passed all eight Python/platform jobs, report/browser workspace checks and four standalone builds. The browser tests cover OS onboarding, local JSON import, HTML injection, malformed imports, independently pinned Ed25519 signatures, wrong-key rejection, encrypted IndexedDB retention, wrong passphrases, deletion, offline retrieval, desktop/mobile layout and no evidence uploads.
+Browser checks exercise operating-system onboarding, bounded local JSON/ZIP imports, malformed input rejection, independently pinned Ed25519 signatures, wrong-key rejection, HTML injection resistance, encrypted IndexedDB storage, wrong-passphrase rejection, successful restoration with signer trust cleared, local deletion, assistance while the browser network is offline, desktop/mobile layouts and no evidence uploads.
 
-[Run 37328849810](https://github.com/Kajahkura/RSAT_Project/actions/runs/37328849810), source `21400b9`, passed browser and seven platform jobs; Intel macOS Python 3.13 exposed a race when a capped subprocess exited during cleanup. Cleanup now tolerates that process exit, and final native tests also cover signed snapshots and graph/SBOM exports.
+The [live workspace](https://rsat-workspace.blinkhost.website) serves the verified 2.1.0 frontend. Its JavaScript, worker, stylesheet, synthetic demo, license and hosting README match the release bytes. HTML changes are limited to reviewed inert search metadata; the CSP, referrer policy and executable scripts remain intact. HTTPS, HSTS and `nosniff` were verified. Desktop/mobile screenshots from the hosted checks were inspected.
 
-[Final implementation run 37330491072](https://github.com/Kajahkura/RSAT_Project/actions/runs/37330491072), source `5fdac9a853700e8008241394e366572ffaf83d36`, completed successfully. All eight Python/platform jobs, both browser/report and web security jobs, and all four standalone builds passed. Each native artifact passed its packaged audit, cryptography, signed-snapshot and graph/SBOM smoke checks. The static workspace ZIP was downloaded independently and matched its published SHA-256 (`65e91c467a2b0af46e71e1f20eb76f43b1783703843d17308e23b3a92db9c44d`). Clean desktop/mobile previews were inspected and added to the repository. Tagged publication repeats the full matrix before uploading release assets.
+## Reproduce the source checks
 
-On 10 October 2026, the final local Python 3.13.13 suite passed all 187 tests with 85.96% statement coverage; Ruff also passed. These are local results, distinct from the platform CI conclusions above.
+```sh
+python -m pip install -r requirements-dev.txt -e .
+python -m ruff check src tests scripts
+python -m pytest --cov=rsat --cov-fail-under=80
+python scripts/native_smoke.py
+```
 
-The opt-in WSL experiment with `--progress --ai-tools --inventory` completed, but query latency left only 2 of 14 applicable controls assessed. This is incomplete guest evidence, not a Windows host verdict. A live synthetic OSV Ubuntu 22.04/source-package query succeeded. No actual model or physical TPM attestation was validated.
-
-At the 10 October checkpoint, Node execution on the PC was stopped per user instruction. Web builds and browser checks run remotely through GitHub CI. BlinkHost publication was then pending: native PowerShell startup and saved Password Vault access exceeded diagnostic deadlines before authenticated API operations. A fresh startup diagnostic also exceeded its 20-second deadline, before attempting any credential read. Publication was subsequently completed using the expressly authorized BlinkHost CLI, as recorded below.
-
-## Published 2.1.0 release
-
-[Release run 38075110752](https://github.com/Kajahkura/RSAT_Project/actions/runs/38075110752), tag `v2.1.0`, source `53316e839cc9957c7f5e67df0a1942c08de47e18`, passed all eight platform/Python jobs, both browser jobs, four native builds and release publication. [The public release](https://github.com/Kajahkura/RSAT_Project/releases/tag/v2.1.0) contains Windows x86_64, Linux x86_64, macOS Intel and Apple Silicon executables, the static workspace, checksums and build-environment inventories.
-
-All four public native binaries and the web ZIP were downloaded independently and matched their published SHA-256 values. Every build inventory records version 2.1.0. The static archive includes its MIT license, hosting instructions and synthetic demo. The public Linux binary passed version, key generation, audit, pinned signature verification, encryption/decryption, device initialization, signed snapshot, graph/SBOM exports and rejection of a different signer key locally. This repeat used a 240-second outer startup deadline; each invocation completed in 2.25–6.73 seconds. An earlier checkpoint-artifact run had timed out at wrong-key verification after 60 seconds, so that incomplete run is not counted as a pass.
-
-All four native binaries and the web ZIP had their provenance verified cryptographically with the native GitHub CLI and the published Sigstore bundles. Verification required the exact repository workflow, source digest, `refs/tags/v2.1.0` and GitHub-hosted runners. This establishes the signed build identity and artifact binding, not OS signing/notarization or endpoint health. No Node process was used for local verification.
-
-## BlinkHost publication
-
-On 16 October 2026, the authenticated BlinkHost CLI published the independently verified public 2.1.0 ZIP to [RSAT Evidence Workspace](https://rsat-workspace.blinkhost.website). Deployment request `019b635d-b679-4241-b165-11fbd05e6baf` succeeded on its first attempt; release `291` is active and current in Production for project `1e3b948b-e02b-412f-98d5-a6a2f2b4639a`. All 14 uploaded source files matched the exact tagged frontend and MIT license on readback. There are no hosted backend modules, databases or secrets.
-
-The release ZIP SHA-256 is `1c8f1a2361f291b2e7d3543291d90497d1861f4725a097abe28edd97206a7a03`; the normalized BlinkHost ZIP has digest `45199bec48ca695ceddb325fb2dd3b7c7782ef5529bdd8c5a90cb61fb62fddeb`. Every public JavaScript, worker, stylesheet, synthetic demo, license and README matched the release bytes. HTML differs only by reviewed inert search metadata; the CSP, referrer policy and executable scripts remain intact. HTTPS, HSTS, `nosniff` and matching release/project routing headers were checked independently from this PC using Python. Node ran only the authorized BlinkHost CLI, not local builds or browser tests.
-
-[Hosted run 38968086856](https://github.com/Kajahkura/RSAT_Project/actions/runs/38968086856), source `ac3d64f593234be6af937adf3a70db42bc3f6fd4`, completed successfully. It independently downloaded and checked the pinned release ZIP, verified all seven public files, then passed operating-system onboarding, local JSON/ZIP imports, malformed input rejection, HTML injection resistance, independently pinned Ed25519 verification, wrong-key rejection, encrypted IndexedDB storage, wrong-passphrase rejection, successful restoration with signer trust cleared, local history deletion, assistance while the browser network was offline, desktop/mobile layout and no evidence uploads. Its downloaded verification JSON confirms deployment `291`; clean screenshots from the hosted desktop/mobile checks were inspected.
-
-[Source validation run 38968086839](https://github.com/Kajahkura/RSAT_Project/actions/runs/38968086839), the same source `ac3d64f`, also completed successfully: all eight platform/Python jobs, both browser jobs and all four standalone native builds passed. The deployed frontend remains the independently verified tagged 2.1.0 artifact. Final documentation changes only record these results. The temporary `rsat-deploy` CLI session was logged out after verification.
+Run native checks on the platform being evaluated. The [build workflow](../.github/workflows/build.yml) includes browser and packaged-artifact verification; the [hosted workflow](../.github/workflows/hosted-web.yml) checks the public HTTPS site. CI logs and artifacts provide the result for each source revision.

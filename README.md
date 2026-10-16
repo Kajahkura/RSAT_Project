@@ -46,7 +46,7 @@ Every conclusion links to collected evidence and a versioned rule. PASS, FAIL, U
 | **Evidence relationships** | Provenance-bearing graph exports and clearly conditional change simulations |
 | **Signed device history** | Hash-linked snapshots, replay-resistant enrollment, scoped self-hosted tokens, retention and bounded foreground watch |
 | **Portable intelligence** | CycloneDX SBOM/ML-BOM, OCSF compliance events, pinned publisher VEX/CSAF, explicit external-context contracts |
-| **Reviewed updates and policies** | Maintained TUF download verification and constrained policy drafts with outcome fixtures |
+| **Reviewed updates and policies** | Maintained TUF download verification and constrained policy review with outcome fixtures |
 
 See the [platform guide](docs/platform.md) for commands, trust boundaries and integration prerequisites. Hardware attestation, automatic fleet installation, provider-specific cloud mappings and end-to-end encrypted cloud sync are not implemented.
 

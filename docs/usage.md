@@ -90,7 +90,7 @@ Remote operation requires existing key-based SSH access, a known host key, and R
 
 ```bash
 rsat oscal audit.json --output oscal-export
-rsat summary audit.json --model your-local-model --output draft-summary.json
+rsat summary audit.json --model your-local-model --output summary.json
 ```
 
 OSCAL produces paired assessment-plan/results files, with a required organization-supplied SSP link. The schemas are checked in the test pipeline. UNKNOWN/ERROR outcomes are marked explicitly in observations and target remarks; do not interpret them as measured compliance failure.

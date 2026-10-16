@@ -79,14 +79,14 @@ Publisher envelopes contain `document` plus a base64 Ed25519 `signature` over RS
 
 Imported attestation is explicitly unverified. Hardware-backed RATS/TPM trust requires an independent verifier, fresh challenges, endorsement policy and known-good measurements. A device signature does not satisfy those requirements.
 
-## Updates and reviewed policy drafts
+## Updates and policy review
 
 ```sh
 pip install 'rsat-audit[updates]'
 rsat update-fetch TARGET --root pinned-root.json --metadata-url https://publisher/metadata/ --target-url https://publisher/targets/ --directory update-cache
-rsat policy-draft reviewed-draft.json
+python -m rsat policy-review reviewed-policy.json
 ```
 
 The maintained python-tuf client verifies repository metadata and downloads into persistent rollback state. It never installs or executes the download. Initial root distribution and threshold-signed repository operation are publisher responsibilities. Existing GitHub downloads are not represented as a TUF repository.
 
-Draft input requires `policy`, `sources`, `fixtures` and `review`. Every rule needs PASS, FAIL and UNKNOWN fixtures, bounded declarative operators and an explicit reviewer/hash declaration before signed publication. Passing fixtures does not establish source accuracy; independently reviewed golden-device checks remain necessary.
+Policy review input requires `policy`, `sources`, `fixtures` and `review`. Every rule needs PASS, FAIL and UNKNOWN fixtures, bounded declarative operators and an explicit reviewer/hash declaration before signed publication. Passing fixtures does not establish source accuracy; independently reviewed golden-device checks remain necessary.

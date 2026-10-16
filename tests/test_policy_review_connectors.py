@@ -4,12 +4,13 @@ from unittest.mock import Mock, patch
 
 import pytest
 from rsat.connectors import fetch_context
-from rsat.drafts import validate_draft
+from rsat.cli import main
+from rsat.policy_review import validate_policy_review
 from rsat.model import canonical
 from rsat.policy import load_policy
 
 
-def draft():
+def policy_submission():
     policy = load_policy()
     rule = next(r for r in policy["rules"] if r["id"] == "RSAT-FW-001")
     policy = {**policy, "rules": [rule]}
@@ -34,22 +35,38 @@ def draft():
     }
 
 
-def test_policy_draft_review_and_negative_unknown_fixtures():
-    data = draft()
-    assert validate_draft(data)["approved_for_signed_publication"]
+def test_policy_review_and_negative_unknown_fixtures():
+    data = policy_submission()
+    assert validate_policy_review(data)["approved_for_signed_publication"]
     data["review"]["policy_sha256"] = "a" * 64
-    assert not validate_draft(data)["approved_for_signed_publication"]
+    assert not validate_policy_review(data)["approved_for_signed_publication"]
     data["fixtures"] = data["fixtures"][:1]
     with pytest.raises(ValueError):
-        validate_draft(data)
-    data = draft()
+        validate_policy_review(data)
+    data = policy_submission()
     data["policy"]["rules"][0]["command"] = "evil"
     with pytest.raises(ValueError):
-        validate_draft(data)
-    data = draft()
+        validate_policy_review(data)
+    data = policy_submission()
     data["fixtures"][0]["expected"] = {"RSAT-FW-001": "FAIL"}
     with pytest.raises(ValueError):
-        validate_draft(data)
+        validate_policy_review(data)
+
+
+def test_policy_review_cli_approval_and_fixture_rejection(tmp_path, capsys):
+    source = tmp_path / "reviewed-policy.json"
+    output = tmp_path / "review-result.json"
+    data = policy_submission()
+    source.write_bytes(canonical(data))
+    assert main(["policy-review", str(source), "--output", str(output)]) == 0
+    assert json.loads(output.read_text())["approved_for_signed_publication"] is True
+
+    data["fixtures"][0]["expected"] = {"RSAT-FW-001": "FAIL"}
+    source.write_bytes(canonical(data))
+    rejected_output = tmp_path / "rejected-result.json"
+    assert main(["policy-review", str(source), "--output", str(rejected_output)]) == 1
+    assert not rejected_output.exists()
+    assert "expected fixture outcomes" in capsys.readouterr().err
 
 
 def test_connector_transport_subject_redirection_and_size():

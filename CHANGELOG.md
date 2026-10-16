@@ -1,5 +1,10 @@
 # Changelog
 
+## Source updates — 2026-10-16
+
+- Policy validation is exposed as `policy-review` when running from source, with the same citation, approval and outcome-fixture requirements.
+- Updated public hosting instructions and validation references for the live browser workspace.
+
 ## 2.1.0 — 2026-10-10
 
 - Added an MIT-licensed React/TypeScript browser workspace with platform onboarding, bounded local imports, independently pinned bundle verification, offline assistance and encrypted local history.
@@ -7,10 +12,10 @@
 - Bound model-assisted selections to exact audit hashes and typed evidence claims; added read-only adaptive rechecks and an MCP interface.
 - Added scoped evidence graphs, conditional change simulations and explicit host/guest collection boundaries.
 - Added signed device snapshots, hash-linked history, scoped organization tokens and replay-resistant enrollment/upload workflows.
-- Added CycloneDX SBOM/ML-BOM, OCSF, pinned VEX/CSAF, bounded external connectors, TUF downloads and reviewed policy drafts.
+- Added CycloneDX SBOM/ML-BOM, OCSF, pinned VEX/CSAF, bounded external connectors, TUF downloads and policy review.
 - Corrected distro/source package advisory identity, skipped-inventory accounting, partial AI-config failures and subprocess cleanup races.
 - Extended native, cryptographic, interoperability and browser security verification. See the [validation record](docs/validation.md) for measured results and platform limits.
-- Packaged the static workspace with checksums and documented BlinkHost publication. Authenticated BlinkHost deployment remains pending; hardware attestation and managed fleet/cloud integrations remain external work.
+- Packaged the static workspace with checksums and documented BlinkHost publication. The public browser workspace is available at https://rsat-workspace.blinkhost.website.
 
 ## 2.0.1 — 2026-10-01
 
