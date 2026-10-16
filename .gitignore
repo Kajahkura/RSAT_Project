@@ -36,3 +36,5 @@ pytest-results.xml
 web/RSAT-web-workspace.zip
 
 web/RSAT-web-SHA256SUMS.txt
+
+hosted-web-verification.json

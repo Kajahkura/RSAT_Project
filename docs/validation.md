@@ -37,7 +37,7 @@ On 10 October 2026, the final local Python 3.13.13 suite passed all 187 tests wi
 
 The opt-in WSL experiment with `--progress --ai-tools --inventory` completed, but query latency left only 2 of 14 applicable controls assessed. This is incomplete guest evidence, not a Windows host verdict. A live synthetic OSV Ubuntu 22.04/source-package query succeeded. No actual model or physical TPM attestation was validated.
 
-Per user instruction, Node execution on the PC was stopped. Web builds and browser checks run remotely through GitHub CI. BlinkHost publication remains pending: native PowerShell startup and saved Password Vault access exceed diagnostic deadlines before authenticated API operations. A fresh 10 October startup diagnostic also exceeded its 20-second deadline, before attempting any credential read. No RSAT project has been published or real evidence uploaded.
+At the 10 October checkpoint, Node execution on the PC was stopped per user instruction. Web builds and browser checks run remotely through GitHub CI. BlinkHost publication was then pending: native PowerShell startup and saved Password Vault access exceeded diagnostic deadlines before authenticated API operations. A fresh startup diagnostic also exceeded its 20-second deadline, before attempting any credential read. Publication was subsequently completed using the expressly authorized BlinkHost CLI, as recorded below.
 
 ## Published 2.1.0 release
 
@@ -46,3 +46,11 @@ Per user instruction, Node execution on the PC was stopped. Web builds and brows
 All four public native binaries and the web ZIP were downloaded independently and matched their published SHA-256 values. Every build inventory records version 2.1.0. The static archive includes its MIT license, hosting instructions and synthetic demo. The public Linux binary passed version, key generation, audit, pinned signature verification, encryption/decryption, device initialization, signed snapshot, graph/SBOM exports and rejection of a different signer key locally. This repeat used a 240-second outer startup deadline; each invocation completed in 2.25–6.73 seconds. An earlier checkpoint-artifact run had timed out at wrong-key verification after 60 seconds, so that incomplete run is not counted as a pass.
 
 All four native binaries and the web ZIP had their provenance verified cryptographically with the native GitHub CLI and the published Sigstore bundles. Verification required the exact repository workflow, source digest, `refs/tags/v2.1.0` and GitHub-hosted runners. This establishes the signed build identity and artifact binding, not OS signing/notarization or endpoint health. No Node process was used for local verification.
+
+## BlinkHost publication
+
+On 16 October 2026, the authenticated BlinkHost CLI published the independently verified public 2.1.0 ZIP to [RSAT Evidence Workspace](https://rsat-workspace.blinkhost.website). Deployment request `019b635d-b679-4241-b165-11fbd05e6baf` succeeded on its first attempt; release `291` is active and current in Production for project `1e3b948b-e02b-412f-98d5-a6a2f2b4639a`. All 14 uploaded source files matched the exact tagged frontend and MIT license on readback. There are no hosted backend modules, databases or secrets.
+
+The release ZIP SHA-256 is `1c8f1a2361f291b2e7d3543291d90497d1861f4725a097abe28edd97206a7a03`; the normalized BlinkHost ZIP has digest `45199bec48ca695ceddb325fb2dd3b7c7782ef5529bdd8c5a90cb61fb62fddeb`. Every public JavaScript, worker, stylesheet, synthetic demo, license and README matched the release bytes. HTML differs only by reviewed inert search metadata; the CSP, referrer policy and executable scripts remain intact. HTTPS, HSTS, `nosniff` and matching release/project routing headers were checked independently from this PC using Python. Node ran only the authorized BlinkHost CLI, not local builds or browser tests.
+
+The hosted browser validation workflow now exercises the full local evidence security flows on the real HTTPS origin. Its result will be recorded after completion.

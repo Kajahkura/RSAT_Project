@@ -1,11 +1,13 @@
 """Browser checks for local import, trust, encrypted history, injection and responsive onboarding."""
 
 import json
+import os
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import tempfile
 import threading
+from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright
 from rsat.bundle import generate_keys, create_bundle
@@ -19,10 +21,26 @@ class Quiet(SimpleHTTPRequestHandler):
         pass
 
 
-server = ThreadingHTTPServer(("127.0.0.1", 0), partial(Quiet, directory=str(root / "web/dist")))
-thread = threading.Thread(target=server.serve_forever, daemon=True)
-thread.start()
-base = f"http://127.0.0.1:{server.server_port}"
+server = None
+base = os.environ.get("RSAT_WEB_BASE_URL", "").rstrip("/")
+if base:
+    parsed = urlsplit(base)
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or parsed.username
+        or parsed.password
+        or parsed.path
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ValueError("RSAT_WEB_BASE_URL must be an HTTPS origin without credentials")
+else:
+    server = ThreadingHTTPServer(("127.0.0.1", 0), partial(Quiet, directory=str(root / "web/dist")))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    base = f"http://127.0.0.1:{server.server_port}"
+origin = urlsplit(base)
 try:
     with tempfile.TemporaryDirectory() as temporary, sync_playwright() as p:
         tmp = Path(temporary)
@@ -34,7 +52,9 @@ try:
         page.on(
             "request",
             lambda r: (
-                evidence_requests.append(r.url) if r.method != "GET" or not r.url.startswith(base) else None
+                evidence_requests.append(r.url)
+                if r.method != "GET" or urlsplit(r.url).netloc != origin.netloc
+                else None
             ),
         )
         page.goto(base, wait_until="networkidle", timeout=60000)
@@ -62,9 +82,11 @@ try:
         page.get_by_label("Search findings").fill("no-such-control")
         assert page.locator("tbody tr").count() == 0
         page.get_by_role("button", name="Assistant", exact=True).click()
+        page.context.set_offline(True)
         page.get_by_label("Your question").fill("firewall")
         page.get_by_role("button", name="Find evidence").click()
         assert page.locator(".answer-list article").count() > 0
+        page.context.set_offline(False)
         audit = json.loads((root / "web/public/demo-audit.json").read_text())
         audit["findings"][0]["title"] = '<img src=x onerror="window.RSAT_INJECTED=true">'
         hostile = tmp / "hostile.json"
@@ -103,6 +125,11 @@ try:
         page.get_by_label("History passphrase").fill("wrong-passphrase-123")
         page.get_by_role("button", name="Unlock", exact=True).click()
         page.get_by_role("status").filter(has_text="Unable to unlock").wait_for(timeout=60000)
+        page.get_by_label("History passphrase").fill("synthetic-passphrase-123")
+        page.get_by_role("button", name="Unlock", exact=True).click()
+        page.get_by_role("status").filter(has_text="Local snapshot unlocked").wait_for(timeout=60000)
+        page.get_by_text("Decrypted browser history · signer trust not retained", exact=True).wait_for()
+        page.get_by_role("button", name="Local history", exact=True).click()
         page.get_by_role("button", name="Delete local history").click()
         page.get_by_role("status").filter(has_text="All local encrypted snapshots deleted").wait_for()
         assert page.locator(".history-row").count() == 0
@@ -113,8 +140,9 @@ try:
         assert not evidence_requests, evidence_requests
         browser.close()
 finally:
-    server.shutdown()
-    server.server_close()
+    if server is not None:
+        server.shutdown()
+        server.server_close()
 print(
     "Web browser checks passed: local import, pinned trust, injection, encrypted storage, offline retrieval, responsive layout, no evidence uploads"
 )

@@ -13,7 +13,7 @@
 <p align="center"><strong>Endpoint and AI tooling security, grounded in evidence.</strong><br>Inspect the evidence. Prioritize the work. Verify the improvement.</p>
 
 <p align="center">
-  <a href="#quick-start">Quick start</a> · <a href="docs/usage.md">Usage guide</a> · <a href="docs/architecture.md">Architecture</a> · <a href="docs/validation.md">Validation</a> · <a href="CONTRIBUTING.md">Contribute</a>
+  <a href="https://rsat-workspace.blinkhost.website">Open web workspace</a> · <a href="#quick-start">Quick start</a> · <a href="docs/usage.md">Usage guide</a> · <a href="docs/architecture.md">Architecture</a> · <a href="docs/validation.md">Validation</a> · <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
 RSAT is an open-source Remote Security Audit Tool that runs a bounded, read-only endpoint assessment and produces a self-contained HTML report, structured JSON, and a remediation plan. It works locally without a persistent agent or a required cloud service. The optional [browser workspace](web/) adds local imports, independently pinned bundle verification, evidence inspection and encrypted local history. Optional workflows add existing SSH/HTTPS WinRM collection, signed evidence, recipient encryption, vulnerability intelligence, and comparisons across audits.
@@ -52,7 +52,7 @@ See the [platform guide](docs/platform.md) for commands, trust boundaries and in
 
 ### Browser workspace
 
-Start with operating-system-specific onboarding, open evidence locally, inspect findings and relationships, and keep encrypted history in your browser. Download the static workspace from the [2.1.0 release](https://github.com/Kajahkura/RSAT_Project/releases/tag/v2.1.0) or follow the [self-hosting guide](docs/deployment.md).
+Open the [live RSAT workspace](https://rsat-workspace.blinkhost.website), start with operating-system-specific onboarding, open evidence locally, inspect findings and relationships, and keep encrypted history in your browser. You can also download the static workspace from the [2.1.0 release](https://github.com/Kajahkura/RSAT_Project/releases/tag/v2.1.0) or follow the [self-hosting guide](docs/deployment.md).
 
 <img src="docs/assets/workspace-desktop.png" alt="Synthetic RSAT browser workspace with assessment scope, coverage, evidence gaps and prioritized findings" width="100%">
 
@@ -61,7 +61,7 @@ Start with operating-system-specific onboarding, open evidence locally, inspect 
 <img src="docs/assets/workspace-mobile.png" alt="Synthetic RSAT browser workspace on a mobile screen" width="320">
 </details>
 
-*Screenshots use synthetic evidence. BlinkHost publication is pending authenticated access; the release ZIP supports independent static hosting.*
+*Screenshots use synthetic evidence. The BlinkHost workspace serves release 2.1.0; imports and encrypted history stay in your browser.*
 
 ## Quick start
 
