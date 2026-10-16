@@ -17,15 +17,16 @@ function App(){
  const [decisions,setDecisions]=useState<Decision[]>([]),[deviceLabel,setDeviceLabel]=useState(''),[currentHash,setCurrentHash]=useState(''),[dirty,setDirty]=useState(false),[importError,setImportError]=useState(''),[pending,setPending]=useState<{snapshot:Snapshot;trust:string;hash:string}|null>(null),[now,setNow]=useState(Date.now()),[editorDirty,setEditorDirty]=useState(false);
  const input=useRef<HTMLInputElement>(null),worker=useRef<Worker|null>(null);
  const importSequence=useRef(0);
+ const unsaved=useRef(false);unsaved.current=dirty||editorDirty;
  useEffect(()=>{let active=true;listHistory().then(rows=>{if(active)setHistory(rows);}).catch(e=>{if(active)setMessage((e as Error).message);});return()=>{active=false;importSequence.current++;worker.current?.terminate();};},[]);
  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),60000);return()=>clearInterval(timer);},[]);
- useEffect(()=>{if(!dirty&&!editorDirty)return;const warn=(event:BeforeUnloadEvent)=>{event.preventDefault();};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn);},[dirty,editorDirty]);
+ useEffect(()=>{if(!dirty&&!editorDirty)return;const warn=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn);},[dirty,editorDirty]);
  const m=audit?metrics(audit):null;
  function acceptAudit(next:{snapshot:Snapshot;trust:string;hash:string}) {
   setAudit(next.snapshot.audit);setDecisions(next.snapshot.decisions);setDeviceLabel(next.snapshot.deviceLabel);setCurrentHash(next.hash);setTrust(next.trust);setDirty(false);setEditorDirty(false);setPending(null);setOnboard(false);setTab('Overview');setAnswers(null);setSelected(null);setImportError('');setMessage(next.trust.startsWith('Decrypted') ? 'Local snapshot unlocked.' : 'Evidence opened locally. No evidence was uploaded.');
  }
  function requestOpen(next:{snapshot:Snapshot;trust:string;hash:string}) {
-  if(dirty||editorDirty){setPending(next);setMessage('Unsaved remediation notes or device labels are present. Save them in Local history or explicitly open the incoming assessment.');}else acceptAudit(next);
+  if(unsaved.current){setPending(next);setMessage('Unsaved remediation notes or device labels are present. Save them in Local history or explicitly open the incoming assessment.');}else acceptAudit(next);
  }
  async function openSnapshot(snapshot:Snapshot) {
   const sequence=++importSequence.current;const hash=await auditHash(snapshot.audit);
