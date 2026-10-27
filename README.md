@@ -22,6 +22,9 @@ Device security settings are spread across system menus, management tools and co
 
 RSAT is built for system administrators checking device baselines, security practitioners investigating configuration gaps, consultants preparing client assessments, and developers reviewing their workstations and local AI tools. The aim is repeatable security review with clear evidence, open code and practical next steps.
 
+
+[About the creator](https://onyedika.blinkhost.website/about) · [Project case study](https://onyedika.blinkhost.website/_server_islands/api/read/work/rsat)
+
 ## An audit you can inspect
 
 Every conclusion links to collected evidence and a versioned rule. PASS, FAIL, UNKNOWN, ERROR, and NOT_APPLICABLE remain distinct. Coverage shows how much of the applicable policy was assessed; it is not an overall security score.
