@@ -8,4 +8,4 @@ jsonschema==4.26.0
 regex==2026.9.29
 
 tuf==7.0.1; sys_platform != "darwin" or platform_machine != "x86_64"
-securesystemslib==1.5.1; sys_platform != "darwin" or platform_machine != "x86_64"
+securesystemslib==1.6.0; sys_platform != "darwin" or platform_machine != "x86_64"
