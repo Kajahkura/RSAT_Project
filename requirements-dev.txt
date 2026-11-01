@@ -1,5 +1,5 @@
 -r requirements.txt
-pytest==9.1.1
+pytest==9.2.0
 ruff==0.16.10
 cryptography==50.0.2; sys_platform != 'darwin' or platform_machine != 'x86_64'
 pycryptodomex==3.23.0
